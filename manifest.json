@@ -2,7 +2,7 @@
   "name": "EPhone",
   "short_name": "EPhone",
   "start_url": "./index.html",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "icons": [
