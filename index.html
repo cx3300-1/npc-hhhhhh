@@ -25569,37 +25569,69 @@ audioPlayer.addEventListener('play', () => {
         
                     const chatInput = document.getElementById('chat-input');
                     // ▼▼▼ 找到 id="send-btn" 的 click 事件监听器 ▼▼▼
-        // ▼▼▼ 用这段【已集成引用功能】的代码替换旧的 'send-btn' 点击事件 ▼▼▼
-        document.getElementById('send-btn').addEventListener('click', async () => { 
-            const content = chatInput.value.trim(); 
-            if (!content || !state.activeChatId) return; 
+// 【最终性能优化版】
+document.getElementById('send-btn').addEventListener('click', () => { // 注意：移除了 async
+    const content = chatInput.value.trim();
+    if (!content || !state.activeChatId) return;
 
-            // ▲▲▲ 确认结束 ▲▲
-            const chat = state.chats[state.activeChatId]; 
-        
-            const msg = { 
-                role: 'user', 
-                content, 
-                timestamp: Date.now() 
-            };
-        
-            // 检查当前是否处于引用回复模式
-            if (currentReplyContext) {
-                msg.quote = currentReplyContext; // 将引用信息附加到消息对象上
+    const chat = state.chats[state.activeChatId];
+    const msg = {
+        role: 'user',
+        content,
+        timestamp: Date.now()
+    };
+
+    if (currentReplyContext) {
+        msg.quote = currentReplyContext;
+    }
+
+    // 【优化1：先渲染，后保存】立即将消息显示在屏幕上，给用户即时反馈！
+    appendMessage(msg, chat);
+
+    // 【优化2：异步处理耗时操作】将数据存储和列表更新放到后台，不阻塞用户界面
+    (async () => {
+        chat.history.push(msg);
+        await db.chats.put(chat); // 保存到数据库
+        updateChatListItem(chat.id); // 【优化3】使用“精准更新”替换“全局刷新”
+/**
+ * 【全新】精准更新单个聊天项的预览和位置，而不是刷新整个列表
+ * @param {string} chatId - 需要更新的聊天ID
+ */
+function updateChatListItem(chatId) {
+    const chat = state.chats[chatId];
+    if (!chat) return;
+
+    const chatListEl = document.getElementById('chat-list');
+    const existingItem = chatListEl.querySelector(`.chat-list-item[data-chat-id="${chatId}"]`);
+    
+    // 1. 创建一个新的、包含最新信息的列表项
+    const newItem = createChatListItem(chat);
+
+    // 2. 如果旧的列表项存在，就用新的替换它
+    if (existingItem) {
+        const parent = existingItem.parentNode;
+        parent.replaceChild(newItem, existingItem);
+
+        // 3. 如果这个聊天没有被置顶，就把它移动到最前面（非置顶区域的顶部）
+        if (!chat.isPinned) {
+            const firstUnpinned = chatListEl.querySelector('.chat-list-item:not(.pinned)');
+            if (firstUnpinned && firstUnpinned !== newItem) {
+                chatListEl.insertBefore(newItem, firstUnpinned);
             }
-        
-            chat.history.push(msg); 
-            await db.chats.put(chat); 
-            appendMessage(msg, chat); 
-            renderChatList(); 
-            chatInput.value = ''; 
-            chatInput.style.height = 'auto'; 
-            chatInput.focus(); 
-        
-            // 发送后，取消引用模式document.getElementById('reset-global-css-btn').addEventListener('click', () => {
-            cancelReplyMode(); 
-        });
-        // ▲▲▲ 替换结束 ▲▲▲
+        }
+    } else {
+        // 如果列表里之前没有这一项，就直接添加到顶部
+        chatListEl.prepend(newItem);
+    }
+}
+    })();
+
+    // 清理工作（这部分很快，可以立即执行）
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    chatInput.focus();
+    cancelReplyMode();
+});
                     document.getElementById('wait-reply-btn').addEventListener('click', triggerAiResponse);
                     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('send-btn').click(); } });
                     //chatInput.addEventListener('input', () => { chatInput.style.height = 'auto'; chatInput.style.height = (chatInput.scrollHeight) + 'px'; });
@@ -29201,5 +29233,4 @@ document.getElementById('status-bar-toggle-switch').addEventListener('change', (
 <!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
 </body>
 </html>
-
 
