@@ -5232,84 +5232,82 @@
             color: white;
         }
         /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
-        /* ▼▼▼ 【全新】角色洞察与历史记录样式 (V5 - 布局美化版) ▼▼▼ */
-        
-        /* 1. 弹窗背景 */
-        #character-profile-modal {
-            background-color: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        
-        /* 2. 卡片主体内容区 */
-        .character-profile-content {
-            width: 320px;
-            height: 75vh;
-            max-height: 580px;
-            background-color: #f0f2f5;
-            border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow: hidden;
-            /* 【核心修改1】增加顶部的内边距，让头部信息更舒展 */
-            padding-top: 40px; 
-        }
-        
-        /* 3. 右上角“查看历史”图标按钮 (保持不变) */
-        #profile-history-icon-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 36px;
-            height: 36px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
-            padding: 0;
-            z-index: 10;
-        }
-        #profile-history-icon-btn:hover { background-color: rgba(0,0,0,0.05); }
-        #profile-history-icon-btn svg { width: 20px; height: 20px; stroke: #b0b0b0; stroke-width: 2; }
-        
-        /* 4. 主资料页与历史记录页的容器 */
-        #profile-main-content, #profile-thoughts-history-view {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-        }
-        
-        /* 5. 主资料页独有的样式 */
-        #profile-main-content {
-            padding: 0 25px 25px 25px; /* 移除了顶部padding，因为它已在父元素中定义 */
-            /* 【核心修改2】显著增加卡片之间的垂直间距，解决“挤”的问题 */
-            gap: 20px; 
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-        
-        /* 6. 头部信息区 */
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-shrink: 0;
-            /* 【核心修改3】为头部下方增加明确的边距 */
-            margin-bottom: 10px; 
-        }
-        #profile-avatar { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; }
-        .profile-info { display: flex; flex-direction: column; }
-        #profile-name { font-size: 20px; font-weight: 600; color: #1f1f1f; }
-        #profile-id { font-size: 14px; color: #8a8a8a; }
+/* 1. 弹窗背景 */
+#character-profile-modal {
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* 2. 卡片主体内容区 */
+.character-profile-content {
+    width: 320px;
+    height: 75vh;
+    max-height: 580px;
+    background-color: #f0f2f5;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    /* 【核心修改1】增加顶部的内边距，让头部信息更舒展 */
+    padding-top: 40px; 
+}
+
+/* 3. 右上角“查看历史”图标按钮 (保持不变) */
+#profile-history-icon-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    padding: 0;
+    z-index: 10;
+}
+#profile-history-icon-btn:hover { background-color: rgba(0,0,0,0.05); }
+#profile-history-icon-btn svg { width: 20px; height: 20px; stroke: #b0b0b0; stroke-width: 2; }
+
+/* 4. 主资料页与历史记录页的容器 */
+#profile-main-content, #profile-thoughts-history-view {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* 5. 主资料页独有的样式 */
+#profile-main-content {
+    padding: 0 25px 25px 25px; /* 移除了顶部padding，因为它已在父元素中定义 */
+    /* 【核心修改2】显著增加卡片之间的垂直间距，解决“挤”的问题 */
+    gap: 20px; 
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* 6. 头部信息区 */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
+    /* 【核心修改3】为头部下方增加明确的边距 */
+    margin-bottom: 10px; 
+}
+#profile-avatar { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; }
+.profile-info { display: flex; flex-direction: column; }
+#profile-name { font-size: 20px; font-weight: 600; color: #1f1f1f; }
+#profile-id { font-size: 14px; color: #8a8a8a; }
         
 /* ▼▼▼ 【全新V2版】心声与散记卡片样式 ▼▼▼ */
 
@@ -5359,36 +5357,54 @@
 
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
         
-        /* 10. 历史记录页面特定样式 (保持不变) */
-        #profile-thoughts-history-view { display: none; padding: 0 25px 25px 25px; }
-        #profile-thoughts-history-view .profile-header { justify-content: space-between; padding-bottom: 15px; }
-        #profile-thoughts-history-view .profile-header span { font-size: 18px; font-weight: 600; }
-        #history-back-btn { width: 36px; height: 36px; background: none; border: none; cursor: pointer; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; padding: 0; }
-        #history-back-btn:hover { background-color: rgba(0,0,0,0.05); }
-        #history-back-btn svg { width: 22px; height: 22px; stroke: #a0a0a0; stroke-width: 2.5; }
-        
-        /* 11. 历史记录列表 (保持不变) */
-        #thoughts-history-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 5px;
-            margin-right: -10px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .thought-card { background-color: #ffffff; border-radius: 16px; padding: 15px 20px; border: 1px solid #eee; }
-        .thought-header { font-size: 12px; color: #b0b0b0; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
-        .thought-content .label { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #a0a0a0; font-size: 13px; margin-bottom: 6px; }
-        .thought-content .label svg { width: 16px; height: 16px; }
-        .thought-content .text { font-size: 14px; color: #555; line-height: 1.7; white-space: pre-wrap; padding-left: 22px; }
-        .thought-content .jottings { margin-top: 15px; }
-        
-        /* 12. 隐藏滚动条 (保持不变) */
-        #profile-main-content::-webkit-scrollbar,
-        #thoughts-history-list::-webkit-scrollbar { display: none; }
-        #profile-main-content, #thoughts-history-list { -ms-overflow-style: none; scrollbar-width: none; }
-        /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+/* 10. 历史记录页面特定样式 (保持不变) */
+#profile-thoughts-history-view { display: none; padding: 0 25px 25px 25px; }
+#profile-thoughts-history-view .profile-header { justify-content: space-between; padding-bottom: 15px; }
+#profile-thoughts-history-view .profile-header span { font-size: 18px; font-weight: 600; }
+#history-back-btn { width: 36px; height: 36px; background: none; border: none; cursor: pointer; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; padding: 0; }
+#history-back-btn:hover { background-color: rgba(0,0,0,0.05); }
+#history-back-btn svg { width: 22px; height: 22px; stroke: #a0a0a0; stroke-width: 2.5; }
+
+/* 11. 历史记录列表 (保持不变) */
+#thoughts-history-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+    margin-right: -10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.thought-card { background-color: #ffffff; border-radius: 16px; padding: 15px 20px; border: 1px solid #eee; }
+.thought-header { font-size: 12px; color: #b0b0b0; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+.thought-content .label { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #a0a0a0; font-size: 13px; margin-bottom: 6px; }
+.thought-content .label svg { width: 16px; height: 16px; }
+.thought-content .text { font-size: 14px; color: #555; line-height: 1.7; white-space: pre-wrap; padding-left: 22px; }
+.thought-content .jottings { margin-top: 15px; }
+
+/* 12. 隐藏滚动条 (保持不变) */
+#profile-main-content::-webkit-scrollbar,
+#thoughts-history-list::-webkit-scrollbar { display: none; }
+#profile-main-content, #thoughts-history-list { -ms-overflow-style: none; scrollbar-width: none; }
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【最终版】心声页面与历史记录美化样式 ▼▼▼ */
+
+/* 1. 将角色详情页（心声页面）的背景修改为纯白色 */
+.character-profile-content {
+    background-color: #ffffff !important;
+}
+
+/* 2. 仅隐藏“散记”标签 (在主页和历史记录中都生效) */
+#character-profile-modal .jottings .label {
+    display: none;
+}
+
+/* 3. 【对齐修正】移除心声和散记内容的左边距，让它们与标题对齐 */
+#character-profile-modal .thought-content .text {
+    padding-left: 0;
+}
+
+/* ▲▲▲ 样式结束 ▲▲▲ */
         /* ▼▼▼ 【全新】导演剪辑室样式 ▼▼▼ */
         #ai-response-editor-container {
             display: flex;
@@ -22550,7 +22566,7 @@ function updateMusicProgressBar() {
         
         // ▲▲▲ 新函数粘贴结束 ▲▲▲
         /**
-         * 【全新 | 已修复BUG】显示角色洞察弹窗
+
          * @param {string} chatId - 要显示的角色所在的聊天ID
          */
         function showCharacterProfileModal(chatId) {
@@ -22558,9 +22574,9 @@ function updateMusicProgressBar() {
             if (!chat || chat.isGroup) return;
         
             // 填充数据
-            document.getElementById('profile-avatar').src = chat.settings.aiAvatar || defaultAvatar;
-            document.getElementById('profile-name').textContent = chat.name;
-            document.getElementById('profile-id').textContent = `ID: ${chat.originalName}`;
+            //document.getElementById('profile-avatar').src = chat.settings.aiAvatar || defaultAvatar;
+            //document.getElementById('profile-name').textContent = chat.name;
+            //document.getElementById('profile-id').textContent = `ID: ${chat.originalName}`;
             document.getElementById('profile-heartfelt-voice').textContent = chat.heartfeltVoice || '...';
             document.getElementById('profile-random-jottings').textContent = chat.randomJottings || '...';
             
@@ -22581,16 +22597,17 @@ function updateMusicProgressBar() {
             renderThoughtsHistory();
         }
         
-        /**
-         * 【全新 | 已修复BUG】隐藏心声历史记录视图，返回主资料页
-         */
-        function hideThoughtsHistory() {
-            document.getElementById('profile-thoughts-history-view').style.display = 'none';
-            
-            // 【核心修复】将 'block' 改为 'flex'，恢复其正确的弹性布局
-            document.getElementById('profile-main-content').style.display = 'flex'; 
-        }
-        
+// ▼▼▼ 【请用这个已修复的版本】替换旧的 hideThoughtsHistory 函数 ▼▼▼
+/**
+ * 【全新 | 已修复BUG】隐藏心声历史记录视图，返回主资料页
+ */
+function hideThoughtsHistory() {
+    document.getElementById('profile-thoughts-history-view').style.display = 'none';
+    
+    // 【核心修复】将 'block' 改为 'flex'，恢复其正确的弹性布局
+    document.getElementById('profile-main-content').style.display = 'flex'; 
+}
+// ▲▲▲ 替换结束 ▲▲▲
         /**
          * 【全新 | 分页加载版】渲染心声历史记录列表
          */
@@ -29041,64 +29058,50 @@ document.getElementById('status-bar-toggle-switch').addEventListener('change', (
             </div>
         </div>
     </div>
-    <!-- ▼▼▼ 【全新】角色洞察弹窗 (V3 - 美化版) ▼▼▼ -->
-    <div id="character-profile-modal" class="modal">
-        <div class="character-profile-content">
-            <!-- ▼▼▼ 【全新】角色洞察弹窗 (V3.1 - 图标美化版) ▼▼▼ -->
-            <button id="profile-history-icon-btn" title="查看历史心声">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                </svg>
-            </button>
-            <!-- ▲▲▲ 替换结束 ▲▲▲ -->
-<!-- ▼▼▼ 请用这整块全新的代码，替换旧的 id="profile-main-content" ▼▼▼ -->
-<div id="profile-main-content">
-    <div class="profile-header">
-        <img id="profile-avatar" src="">
-        <div class="profile-info">
-            <span id="profile-name"></span>
-            <span id="profile-id"></span>
-        </div>
-    </div>
-
-    <!-- “心声”卡片的新结构 -->
-    <div class="profile-section heart-voice">
-        <div class="profile-section-header">
-            <span class="profile-section-icon">💭</span>
-            <label>心声</label>
-        </div>
-        <p id="profile-heartfelt-voice"></p>
-    </div>
-
-    <!-- “散记”卡片的新结构 -->
-    <div class="profile-section random-jottings">
-        <div class="profile-section-header">
-            <span class="profile-section-icon">📌</span>
-            <label>散记</label>
-        </div>
-        <p id="profile-random-jottings"></p>
-    </div>
-</div>
-<!-- ▲▲▲ 替换结束 ▲▲▲ -->
-            <!-- 历史记录视图 (保持不变) -->
-            <div id="profile-thoughts-history-view" style="display: none;">
-                <div class="profile-header" style="justify-content: space-between;">
-                    <span style="font-size: 18px; font-weight: 600;">心声记录</span>
-                    <!-- ▼▼▼ 【全新】美化后的返回按钮 ▼▼▼ -->
-                    <button id="history-back-btn" title="返回">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                        </svg>
-                    </button>
-                    <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+<div id="character-profile-modal" class="modal">
+    <div class="character-profile-content">
+        <!-- 右上角的历史记录图标按钮 -->
+        <button id="profile-history-icon-btn" title="查看历史心声">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+        </button>
+        
+        <!-- 主资料页 -->
+        <div id="profile-main-content">
+            <!-- （这里的内容结构与上次类似，但被包裹在了卡片内部） -->
+            <div id="profile-timestamp" class="thought-header"></div>
+            <div class="thought-content">
+                <div class="voice">
+                    <div class="label">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        心声
+                    </div>
+                    <p id="profile-heartfelt-voice" class="text"></p>
                 </div>
-                <div id="thoughts-history-list">
-                    <!-- 历史记录将在这里动态生成 -->
+                <div class="jottings">
+                    <div class="label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path></svg>
+                        散记
+                    </div>
+                    <p id="profile-random-jottings" class="text"></p>
                 </div>
             </div>
         </div>
+
+        <!-- 历史记录页 (保持不变，但现在也在卡片内切换) -->
+        <div id="profile-thoughts-history-view">
+            <div class="profile-header">
+                <span>心声记录</span>
+                <button id="history-back-btn" title="返回">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+            </div>
+            <div id="thoughts-history-list"></div>
+        </div>
     </div>
+</div>
     <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
     <!-- ▼▼▼ 【全新】“我的”头像库专用文件上传输入框 ▼▼▼ -->
     <input type="file" id="my-avatar-upload-input" accept="image/*" hidden>
@@ -29198,3 +29201,5 @@ document.getElementById('status-bar-toggle-switch').addEventListener('change', (
 <!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
 </body>
 </html>
+
+
