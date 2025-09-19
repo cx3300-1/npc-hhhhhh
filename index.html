@@ -6935,6 +6935,40 @@
     width: 45%; /* 让每个按钮占据近一半宽度 */
 }
 /* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】美化外观设置页面的次要按钮 ▼▼▼ */
+.bg-upload-container {
+    /* 确保容器内的按钮能正确对齐 */
+    width: 100%;
+    justify-content: center;
+    gap: 15px; /* 增加按钮之间的间距 */
+}
+
+.bg-upload-container .form-button-secondary {
+    flex-grow: 1; /* 让按钮自动填充空间 */
+    flex-basis: 0; /* 确保flex-grow生效 */
+    max-width: 180px; /* 给一个最大宽度，避免在宽屏上拉伸过度 */
+    margin-top: 0;
+    padding: 12px; /* 适中的内边距，让按钮更饱满 */
+    font-size: 15px;
+    font-weight: 600; /* 与主按钮一致的字重 */
+    border-radius: 8px; /* 与主按钮一致的圆角 */
+    border: none; /* 移除边框，更像iOS风格 */
+    background-color: #e9e9eb; /* iOS风格的浅灰色 */
+    color: #1c1c1e; /* 深色文字 */
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.bg-upload-container .form-button-secondary:active {
+    transform: scale(0.98); /* 添加点击反馈 */
+}
+
+/* 为“移除”按钮设置特殊的警告色 */
+#remove-global-bg-btn {
+    background-color: #ffebee;
+    color: #c62828;
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
     </style>
 </head>
 <body>
@@ -7623,6 +7657,16 @@
                 <div id="wallpaper-preview">点击下方上传</div>
                 <button class="form-button" onclick="document.getElementById('wallpaper-upload-input').click();">上传壁纸</button>
                 <input type="file" id="wallpaper-upload-input" accept="image/*">
+        <!-- ▼▼▼ 全局聊天背景设置 (按钮已美化) ▼▼▼ -->
+        <hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
+        <label style="font-weight: 500; color: var(--text-secondary);">全局聊天背景 (所有聊天默认)</label>
+        <div id="global-bg-preview" class="wallpaper-preview" style="height: 160px; width: 90px;">点击下方上传</div>
+        <div class="bg-upload-container">
+            <button class="form-button-secondary" onclick="document.getElementById('global-bg-input').click()">上传全局背景</button>
+            <button id="remove-global-bg-btn" class="form-button-secondary">移除全局背景</button>
+        </div>
+        <input type="file" id="global-bg-input" accept="image/*" style="display: none;">
+        <!-- ▲▲▲ 修改结束 ▲▲▲ -->
                 <!-- 夜间模式开关 -->
                 <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
                     <label for="theme-toggle-switch" style="margin-bottom: 0;">夜间模式</label>
@@ -11622,7 +11666,8 @@ state.globalSettings = globalSettings || {
     appIcons: { ...DEFAULT_APP_ICONS },
     globalCss: '',
     notificationSoundUrl: '',
-    widgetData: {} // 【核心修改】在这里新增一个空对象
+    widgetData: {},
+    globalChatBackground: '' // 【核心新增】全局聊天背景
 };
 // 确保即使从旧数据库加载，这个属性也存在
 if (!state.globalSettings.widgetData) {
@@ -12221,50 +12266,62 @@ if (!state.globalSettings.widgetData) {
                 }
                 lockContent.innerHTML = lockHtml;
             }
-            messagesContainer.innerHTML = '';
-            
-            const chatScreen = document.getElementById('chat-interface-screen');
-            chatScreen.style.backgroundImage = chat.settings.background ? `url(${chat.settings.background})` : 'none';
-            
-            const isDarkMode = document.getElementById('phone-screen').classList.contains('dark-mode');
-            chatScreen.style.backgroundColor = chat.settings.background ? 'transparent' : (isDarkMode ? '#000000' : '#f0f2f5');
-            
-            const history = chat.history;
-            const totalMessages = history.length;
-            currentRenderedCount = 0;
-            const initialMessages = history.slice(-MESSAGE_RENDER_WINDOW);
-            // --- ★★★ 核心修改就在这里 ★★★ ---
-            let lastTimestamp = 0;
-            const fragment = document.createDocumentFragment();
+    const chatScreen = document.getElementById('chat-interface-screen');
 
-            for (const msg of initialMessages) {
-                // 检查与上一条消息的时间间隔
-                if (lastTimestamp > 0 && (msg.timestamp - lastTimestamp > 600000)) {
-                    fragment.appendChild(createSystemTimestampElement(msg.timestamp));
-                }
-                const messageEl = await createMessageElement(msg, chat, true);
-                if (messageEl) {
-                    fragment.appendChild(messageEl);
-                }
-                lastTimestamp = msg.timestamp; // 更新时间戳
-            }
-            messagesContainer.appendChild(fragment);
-            // --- ★★★ 修改结束 ★★★ ---
-        
-            currentRenderedCount = initialMessages.length;
-            if (totalMessages > currentRenderedCount) {
-                prependLoadMoreButton(messagesContainer);
-            }
-            
-            const typingIndicator = document.createElement('div');
-            typingIndicator.id = 'typing-indicator';
-            typingIndicator.style.display = 'none';
-            typingIndicator.textContent = '对方正在输入...';
-            messagesContainer.appendChild(typingIndicator);
-            
-            setTimeout(() => messagesContainer.scrollTop = messagesContainer.scrollHeight, 0);
+    // ▼▼▼ 【核心覆盖逻辑】 ▼▼▼
+    const individualBg = chat.settings.background;
+    const globalBg = state.globalSettings.globalChatBackground;
+    const isDarkMode = document.getElementById('phone-screen').classList.contains('dark-mode');
+    const defaultColor = isDarkMode ? '#000000' : '#f0f2f5';
+
+    if (individualBg) {
+        chatScreen.style.backgroundImage = `url(${individualBg})`;
+        chatScreen.style.backgroundColor = 'transparent';
+    } else if (globalBg) {
+        chatScreen.style.backgroundImage = `url(${globalBg})`;
+        chatScreen.style.backgroundColor = 'transparent';
+    } else {
+        chatScreen.style.backgroundImage = 'none';
+        chatScreen.style.backgroundColor = defaultColor;
+    }
+    // ▲▲▲ 逻辑结束 ▲▲▲
+
+    messagesContainer.innerHTML = '';
+    
+    const history = chat.history;
+    const totalMessages = history.length;
+    currentRenderedCount = 0;
+    const initialMessages = history.slice(-MESSAGE_RENDER_WINDOW);
+    
+    let lastTimestamp = 0;
+    const fragment = document.createDocumentFragment();
+
+    for (const msg of initialMessages) {
+        if (lastTimestamp > 0 && (msg.timestamp - lastTimestamp > 3600000)) {
+            fragment.appendChild(createSystemTimestampElement(msg.timestamp));
         }
-        // ▲▲▲ 替换结束 ▲▲▲
+        const messageEl = await createMessageElement(msg, chat, true);
+        if (messageEl) {
+            fragment.appendChild(messageEl);
+        }
+        lastTimestamp = msg.timestamp;
+    }
+    messagesContainer.appendChild(fragment);
+
+    currentRenderedCount = initialMessages.length;
+    if (totalMessages > currentRenderedCount) {
+        prependLoadMoreButton(messagesContainer);
+    }
+    
+    const typingIndicator = document.createElement('div');
+    typingIndicator.id = 'typing-indicator';
+    typingIndicator.style.display = 'none';
+    typingIndicator.textContent = '对方正在输入...';
+    messagesContainer.appendChild(typingIndicator);
+    
+    setTimeout(() => messagesContainer.scrollTop = messagesContainer.scrollHeight, 0);
+}
+// ▲▲▲ 替换结束 ▲▲▲
         
                 function prependLoadMoreButton(container) { const button = document.createElement('button'); button.id = 'load-more-btn'; button.textContent = '加载更早的记录'; button.addEventListener('click', loadMoreMessages); container.prepend(button); }
         
@@ -12310,17 +12367,26 @@ if (!state.globalSettings.widgetData) {
                 preview.style.backgroundImage = bg; 
                 preview.textContent = '当前为渐变色'; 
             }
-            // 【核心修改】在这里调用图标渲染函数
-            renderIconSettings();
-            // ▼▼▼ 在这里粘贴新代码 ▼▼▼
-            document.getElementById('global-css-input').value = state.globalSettings.globalCss || '';
-            // ▲▲▲ 新代码粘贴结束 ▲▲▲
-    // ▼▼▼ 在这里粘贴新代码 ▼▼▼
+    // ▼▼▼ 【核心新增】渲染全局聊天背景 ▼▼▼
+    const globalBgPreview = document.getElementById('global-bg-preview');
+    const globalBg = state.globalSettings.globalChatBackground;
+    if (globalBg) {
+        globalBgPreview.style.backgroundImage = `url(${globalBg})`;
+        globalBgPreview.textContent = '';
+        document.getElementById('remove-global-bg-btn').style.display = 'inline-block';
+    } else {
+        globalBgPreview.style.backgroundImage = 'none';
+        globalBgPreview.textContent = '点击下方上传';
+        document.getElementById('remove-global-bg-btn').style.display = 'none';
+    }
+    // ▲▲▲ 新增结束 ▲▲▲
+
+    renderIconSettings();
+    document.getElementById('global-css-input').value = state.globalSettings.globalCss || '';
     document.getElementById('notification-sound-url-input').value = state.globalSettings.notificationSoundUrl || '';
-    // ▲▲▲ 新代码粘贴结束 ▲▲▲
-              document.getElementById('status-bar-toggle-switch').checked = state.globalSettings.showStatusBar || false;
-        }
-        // ▲▲▲ 替换结束 ▲▲▲
+    document.getElementById('status-bar-toggle-switch').checked = state.globalSettings.showStatusBar || false;
+}
+// ▲▲▲ 替换结束 ▲▲▲
                 window.renderWallpaperScreenProxy = renderWallpaperScreen;
         
                 function applyGlobalWallpaper() { const homeScreen = document.getElementById('home-screen'); const wallpaper = state.globalSettings.wallpaper; if (wallpaper && wallpaper.startsWith('data:image')) homeScreen.style.backgroundImage = `url(${wallpaper})`; else if (wallpaper) homeScreen.style.backgroundImage = wallpaper; }
@@ -29499,7 +29565,56 @@ document.getElementById('clear-posts-list').addEventListener('click', (e) => {
         item.classList.toggle('selected');
     }
 });
+// ▼▼▼ 【全新】全局聊天背景事件绑定 ▼▼▼
+document.getElementById('global-bg-input').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const dataUrl = await new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+        });
+        // 将上传的图片临时保存在 state 中，等待用户点击“保存”
+        state.globalSettings.globalChatBackground = dataUrl;
+        // 实时更新外观设置页面的预览
+        renderWallpaperScreen();
+    }
+    event.target.value = null; // 清空以便下次选择
+});
 
+document.getElementById('remove-global-bg-btn').addEventListener('click', () => {
+    // 移除背景并更新预览
+    state.globalSettings.globalChatBackground = '';
+    renderWallpaperScreen();
+});
+
+// ▼▼▼ 【重要】更新“保存所有外观设置”按钮的逻辑 ▼▼▼
+document.getElementById('save-wallpaper-btn').addEventListener('click', async () => {
+    // 保存个人主页壁纸
+    if (newWallpaperBase64) {
+        state.globalSettings.wallpaper = newWallpaperBase64;
+    }
+    // 【核心修改】全局聊天背景已经在上传或移除时更新到 state 中了，
+    // 所以这里我们只需要将包含所有最新设置的 globalSettings 对象完整地保存一次即可。
+    
+    state.globalSettings.globalCss = document.getElementById('global-css-input').value.trim();
+    state.globalSettings.notificationSoundUrl = document.getElementById('notification-sound-url-input').value.trim();
+    state.globalSettings.showStatusBar = document.getElementById('status-bar-toggle-switch').checked;
+    
+    // 一次性保存所有全局设置
+    await db.globalSettings.put(state.globalSettings);
+    
+    // 应用所有更改
+    applyGlobalWallpaper();
+    newWallpaperBase64 = null;
+    applyAppIcons();
+    applyGlobalCss(state.globalSettings.globalCss);
+    applyStatusBarVisibility();
+
+    alert('外观设置已保存并应用！');
+    showScreen('home-screen');
+});
+// ▲▲▲ 新增代码结束 ▲▲▲
                     showScreen('home-screen');
                 }
         
@@ -29684,5 +29799,4 @@ document.getElementById('clear-posts-list').addEventListener('click', (e) => {
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 </body>
 </html>
-
 
