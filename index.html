@@ -6764,6 +6764,124 @@
 }
 
 /* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 步骤 2：将这段全新的CSS代码，粘贴到 <style> 标签的最末尾 ▼▼▼ */
+
+/* 为动态页面的“三点”按钮设置专属样式 */
+#qzone-more-actions-btn {
+    font-size: 24px;      /* 增大字体，让“…”更清晰 */
+    font-weight: bold;    /* 加粗 */
+    padding: 0 10px;      /* 增加水平可点击区域 */
+    border-radius: 50%;   /* 添加一个圆形背景（悬停时可见） */
+    line-height: 1;       /* 确保垂直居中 */
+    position: relative;
+    top: -2px;            /* 位置微调 */
+    transition: background-color 0.2s;
+}
+#qzone-more-actions-btn:hover {
+    background-color: rgba(0,0,0,0.05); /* 鼠标悬停时显示一个淡淡的灰色圆形背景 */
+}
+
+/* 夜间模式下的悬停效果 */
+#phone-screen.dark-mode #qzone-more-actions-btn:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 步骤 2：将这段【全新的CSS代码】，粘贴到 <style> 标签的最末尾 ▼▼▼ */
+
+/* 清空动态选择列表的样式 */
+#clear-posts-list {
+    overflow-y: auto; /* 内容过长时可以滚动 */
+    flex-grow: 1;
+}
+
+/* 每一个可勾选的项目 */
+.clear-posts-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+.clear-posts-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* 模拟的勾选框 */
+.clear-posts-item .checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    margin-right: 15px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+/* 选中后的样式 */
+.clear-posts-item.selected .checkbox {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+/* 为勾选框添加一个“✔”号 */
+.clear-posts-item.selected .checkbox::after {
+    content: '✔';
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* 项目名称 */
+.clear-posts-item .name {
+    font-weight: 500;
+}
+
+/* 为危险选项（如“清空所有”）添加红色警告样式 */
+.clear-posts-item.danger-option .name {
+    color: #ff3b30;
+    font-weight: 600;
+}
+
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 步骤 2：将这段【全新的CSS代码】，粘贴到 <style> 标签的最末尾 ▼▼▼ */
+
+/* 1. 让心声卡片成为删除按钮的定位锚点 */
+.thought-card {
+    position: relative; /* 关键！ */
+}
+
+/* 2. 删除按钮的样式 */
+.thought-delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(0,0,0,0.05);
+    color: var(--text-secondary);
+    font-size: 20px;
+    line-height: 26px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0; /* 默认隐藏 */
+    transition: all 0.2s ease-in-out;
+}
+
+/* 3. 鼠标悬停在卡片上时，显示删除按钮 */
+.thought-card:hover .thought-delete-btn {
+    opacity: 1;
+}
+
+/* 4. 鼠标悬停在删除按钮上时，变为红色警告 */
+.thought-delete-btn:hover {
+    background-color: #ff3b30;
+    color: white;
+}
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
     </style>
 </head>
 <body>
@@ -7029,6 +7147,10 @@
                 <div class="qzone-header">
                     <span class="back-btn" id="qzone-back-btn">‹</span> <!-- 这个按钮现在只负责从动态返回 -->
                     <span>好友动态</span>
+    <!-- 【核心修改】在这里添加了一个容器和新的“三点”按钮 -->
+    <div class="header-actions">
+        <span class="action-btn" id="qzone-more-actions-btn" title="更多操作">…</span>
+    </div>
                 </div>
                 <div class="qzone-content">
                     <div class="qzone-profile-header">
@@ -7150,6 +7272,23 @@
             </div>
         </div>
         <!-- ▲▲▲ 新的 HTML 粘贴结束 ▲▲▲ -->
+<!-- ▼▼▼ 步骤 1：将这个【全新的模态框】粘贴到 body 内其他模态框的旁边 ▼▼▼ -->
+<div id="clear-posts-modal" class="modal">
+    <div class="modal-content" style="height: 70%;">
+        <div class="modal-header">
+            <span>选择清空范围</span>
+        </div>
+        <div class="modal-body" id="clear-posts-list" style="padding: 0;">
+            <!-- 清空选项将由JS动态生成在这里 -->
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="cancel-clear-posts-btn">取消</button>
+            <!-- 添加了 btn-danger 类，让按钮显示为红色以示警告 -->
+            <button class="save btn-danger" id="confirm-clear-posts-btn">确认清空</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
         <!-- ▼▼▼ 粘贴到 #album-photos-screen 的 div 之后 ▼▼▼ -->
         <input type="file" id="album-photo-input" accept="image/*" multiple hidden>
         <div id="chat-interface-screen" class="screen">
@@ -22677,38 +22816,42 @@ function hideThoughtsHistory() {
                 prependLoadMoreThoughtsButton(listEl);
             }
         }
-        /**
-         * 【全新美化版】根据单条记录数据，创建一张心声历史卡片
-         * @param {object} thought - 一条心声历史记录对象
-         * @returns {HTMLElement} - 创建好的卡片div
-         */
-        function createThoughtCard(thought) {
-            const card = document.createElement('div');
-            card.className = 'thought-card';
-            const date = new Date(thought.timestamp);
-            const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-            
-            card.innerHTML = `
-                <div class="thought-header">${dateString}</div>
-                <div class="thought-content">
-                    <div class="voice">
-                        <div class="label">
-                            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                            心声
-                        </div>
-                        <p class="text">${thought.heartfeltVoice}</p>
-                    </div>
-                    <div class="jottings">
-                        <div class="label">
-                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path></svg>
-                            散记
-                        </div>
-                        <p class="text">${thought.randomJottings}</p>
-                    </div>
+// ▼▼▼ 步骤 1：用这个【全新的函数】，完整替换旧的 createThoughtCard 函数 ▼▼▼
+/**
+ * 【全新美化版】根据单条记录数据，创建一张心声历史卡片
+ * @param {object} thought - 一条心声历史记录对象
+ * @returns {HTMLElement} - 创建好的卡片div
+ */
+function createThoughtCard(thought) {
+    const card = document.createElement('div');
+    card.className = 'thought-card';
+    const date = new Date(thought.timestamp);
+    const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    
+    // 【核心修改】在这里添加了一个删除按钮的HTML
+    card.innerHTML = `
+        <button class="thought-delete-btn" data-timestamp="${thought.timestamp}" title="删除此条记录">×</button>
+        <div class="thought-header">${dateString}</div>
+        <div class="thought-content">
+            <div class="voice">
+                <div class="label">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    心声
                 </div>
-            `;
-            return card;
-        } 
+                <p class="text">${thought.heartfeltVoice}</p>
+            </div>
+            <div class="jottings">
+                <div class="label">
+                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path></svg>
+                    散记
+                </div>
+                <p class="text">${thought.randomJottings}</p>
+            </div>
+        </div>
+    `;
+    return card;
+} 
+// ▲▲▲ 替换结束 ▲▲▲
         // ▼▼▼ 【全新】这是导入角色卡的所有核心功能，请将它们完整粘贴到 init() 函数的前面 ▼▼▼
         
         // ▼▼▼ 【最终PNG导入修复】请用这一整块代码，替换旧的 handleCardImport 函数 ▼▼▼
@@ -25181,6 +25324,155 @@ function applyStatusBarVisibility() {
     phoneScreen.classList.toggle('status-bar-visible', !!state.globalSettings.showStatusBar);
 }
 // ▲▲▲ 新增函数结束 ▲▲▲
+/**
+ * 【全新 V3.0 | 总入口】打开支持勾选的清空动态选择器
+ */
+async function openClearPostsSelectorModal() {
+    const modal = document.getElementById('clear-posts-modal');
+    const listEl = document.getElementById('clear-posts-list');
+    listEl.innerHTML = ''; // 清空旧内容
+
+    // 1. 创建所有选项
+    const options = [];
+
+    // 选项A: 清空所有
+    options.push({ text: '清空所有动态 (危险)', value: 'all', isDanger: true });
+
+    // 选项B: 清空用户自己
+    const myNickname = state.qzoneSettings.nickname || '我';
+    options.push({ text: `仅清空 ${myNickname} 的动态`, value: 'user' });
+
+    // 选项C: 遍历AI角色
+    Object.values(state.chats).forEach(chat => {
+        if (!chat.isGroup) {
+            options.push({ text: `仅清空 ${chat.name} 的动态`, value: chat.id });
+        }
+    });
+
+    // 2. 将选项渲染到列表中
+    options.forEach(opt => {
+        const item = document.createElement('div');
+        item.className = 'clear-posts-item';
+        if (opt.isDanger) {
+            item.classList.add('danger-option');
+        }
+        item.dataset.targetId = opt.value;
+        item.innerHTML = `
+            <div class="checkbox"></div>
+            <span class="name">${opt.text}</span>
+        `;
+        listEl.appendChild(item);
+    });
+    
+    // 3. 显示模态框
+    modal.classList.add('visible');
+}
+
+/**
+ * 【全新 V3.0 | 核心处理器】处理最终的清空确认操作
+ */
+async function handleConfirmClearPosts() {
+    const selectedItems = document.querySelectorAll('#clear-posts-list .clear-posts-item.selected');
+    if (selectedItems.length === 0) {
+        alert("请至少选择一个要清空的范围。");
+        return;
+    }
+
+    const targetIds = Array.from(selectedItems).map(item => item.dataset.targetId);
+    
+    // --- 构建确认信息 ---
+    let targetNames = [];
+    if (targetIds.includes('all')) {
+        targetNames.push('所有动态');
+    } else {
+        if (targetIds.includes('user')) {
+            targetNames.push(`“${state.qzoneSettings.nickname}”`);
+        }
+        targetIds.forEach(id => {
+            const character = state.chats[id];
+            if (character) {
+                targetNames.push(`“${character.name}”`);
+            }
+        });
+    }
+    const confirmMessage = `此操作将永久删除 ${targetNames.join('、 ')} 的所有动态，且无法恢复！`;
+
+    const confirmed = await showCustomConfirm(
+        '确认清空动态？',
+        confirmMessage,
+        { confirmButtonClass: 'btn-danger', confirmText: '确认清空' }
+    );
+
+    if (!confirmed) return;
+
+    try {
+        if (targetIds.includes('all')) {
+            await db.qzonePosts.clear();
+        } else {
+            // 使用 Dexie 的 bulk-delete 功能，一次性高效删除多个作者的动态
+            await db.qzonePosts.where('authorId').anyOf(targetIds).delete();
+        }
+
+        // 同步更新内存缓存并重绘UI
+        qzonePostsCache = await db.qzonePosts.orderBy('timestamp').reverse().toArray();
+        qzonePostsRenderCount = 0;
+        await renderQzonePosts();
+        
+        document.getElementById('clear-posts-modal').classList.remove('visible'); // 关闭选择器
+        await showCustomAlert('操作成功', '选定范围内的动态已被清空。');
+
+    } catch (error) {
+        console.error("清空动态时出错:", error);
+        await showCustomAlert('操作失败', `清空动态时发生错误: ${error.message}`);
+    }
+}
+
+// ▼▼▼ 步骤 3：将这两段全新的JS代码，粘贴到 init() 函数的事件监听器区域 ▼▼▼
+
+/**
+ * 【全新】删除指定的心声/散记记录
+ * @param {number} timestamp - 要删除的记录的时间戳
+ */
+async function handleDeleteThought(timestamp) {
+    const confirmed = await showCustomConfirm(
+        '确认删除',
+        '确定要永久删除这条心声记录吗？此操作不可恢复。',
+        { confirmButtonClass: 'btn-danger', confirmText: '确认删除' }
+    );
+
+    if (confirmed) {
+        const chat = state.chats[state.activeChatId];
+        if (!chat || !chat.thoughtsHistory) return;
+
+        // 从历史记录数组中移除匹配的项
+        chat.thoughtsHistory = chat.thoughtsHistory.filter(thought => thought.timestamp !== timestamp);
+        
+        // 将更新后的聊天数据保存回数据库
+        await db.chats.put(chat);
+        
+        // 重新渲染列表以反映更改
+        renderThoughtsHistory();
+        
+        // 给出成功提示
+        await showCustomAlert('成功', '该条记录已成功删除。');
+    }
+}
+
+// 使用事件委托，为整个历史记录列表容器绑定点击事件
+document.getElementById('thoughts-history-list').addEventListener('click', (e) => {
+    // 检查被点击的是否是删除按钮
+    const deleteBtn = e.target.closest('.thought-delete-btn');
+    if (deleteBtn) {
+        // 从按钮的 data-timestamp 属性中获取时间戳
+        const timestamp = parseInt(deleteBtn.dataset.timestamp);
+        if (!isNaN(timestamp)) {
+            // 调用删除处理函数
+            handleDeleteThought(timestamp);
+        }
+    }
+});
+
+// ▲▲▲ 新增JS代码粘贴结束 ▲▲▲
 
                // ===================================================================
                 // 4. 初始化函数 init()
@@ -29055,6 +29347,23 @@ document.getElementById('status-bar-toggle-switch').addEventListener('change', (
     applyStatusBarVisibility();
 });
 // ▲▲▲ 新增事件结束 ▲▲▲
+// 为“三点”按钮绑定新的入口函数
+document.getElementById('qzone-more-actions-btn').addEventListener('click', openClearPostsSelectorModal);
+
+// 为新模态框的按钮绑定事件
+document.getElementById('cancel-clear-posts-btn').addEventListener('click', () => {
+    document.getElementById('clear-posts-modal').classList.remove('visible');
+});
+document.getElementById('confirm-clear-posts-btn').addEventListener('click', handleConfirmClearPosts);
+
+// 使用事件委托，为列表项添加勾选/取消勾选的点击逻辑
+document.getElementById('clear-posts-list').addEventListener('click', (e) => {
+    const item = e.target.closest('.clear-posts-item');
+    if (item) {
+        item.classList.toggle('selected');
+    }
+});
+
                     showScreen('home-screen');
                 }
         
