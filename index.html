@@ -25079,24 +25079,47 @@ function checkAudioAvailability(url) {
 }
 
 /**
- * 【V3.0 | 已修复字段】从网易云搜索歌曲列表
+ * 从网易云音乐搜索歌曲
+ * @param {string} name - 歌名
+ * @param {string} singer - 歌手名 (可选)
+ * @returns {Promise<Array>} - 返回歌曲结果数组
  */
 async function searchNeteaseMusic(name, singer) {
     try {
         let searchTerm = name.replace(/\s/g, "");
-        if (singer) { searchTerm += `-${singer.replace(/\s/g, "")}`; }
-        const result = await Http_Get(`https://api.vkeys.cn/v2/music/netease?word=${encodeURIComponent(searchTerm)}`);
-        if (!result?.data?.length) return [];
+        if (singer) { searchTerm += ` ${singer.replace(/\s/g, "")}`; }
+
+        // 使用API进行搜索
+        const apiUrl = `https://api.vkeys.cn/v2/music/netease?word=${encodeURIComponent(searchTerm)}`;
         
+        console.log("正在请求网易云音乐API:", apiUrl);
+        
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+            throw new Error(`API 请求失败，状态码: ${response.status}`);
+        }
+        
+        const result = await response.json();
+
+        if (result.code !== 200 || !result.data || result.data.length === 0) {
+            console.log("网易云音乐API未返回有效结果:", result);
+            return [];
+        }
+        
+        // 格式化并返回结果
         return result.data.map(song => ({
-            name: song.name,
-            artist: song.ar.map(a => a.name).join(' / '),
+            name: song.song,
+            artist: song.singer,
             id: song.id,
-            cover: song.al?.picUrl || song.picUrl || 'https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1757748720126_qdqqd_1jt5sv.jpeg',
+            cover: song.cover || 'https://i.postimg.cc/pT2xKzPz/album-cover-placeholder.png',
             source: 'netease'
-        })).slice(0,30);
+        })).slice(0, 30); // 最多返回15条结果
+
     } catch (e) {
-        console.error("网易云搜索API失败:", e);
+        console.error("网易云音乐搜索失败:", e);
+        // 您可以根据需要，在这里添加用户友好的错误提示
+        // 例如: await showCustomAlert("网易云搜索失败", `错误信息: ${e.message}`);
         return [];
     }
 }
@@ -29661,5 +29684,4 @@ document.getElementById('clear-posts-list').addEventListener('click', (e) => {
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 </body>
 </html>
-
 
