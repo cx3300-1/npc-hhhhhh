@@ -16166,6 +16166,74 @@ function updatePlaylistUI() {
     });
 }
 
+
+
+async function togglePlayPause() {
+    if (audioPlayer.paused) {
+        if (musicState.currentIndex === -1 && musicState.playlist.length > 0) {
+            playSong(0);
+        } 
+        else if (musicState.currentIndex > -1) {
+            playSong(musicState.currentIndex);
+        }
+    } else {
+        audioPlayer.pause();
+        await addMusicActionSystemMessage('暂停了音乐');
+    }
+}
+
+function playNext() { if (musicState.playlist.length === 0) return; let nextIndex; switch(musicState.playMode) { case 'random': nextIndex = Math.floor(Math.random() * musicState.playlist.length); break; case 'single': playSong(musicState.currentIndex); return; case 'order': default: nextIndex = (musicState.currentIndex + 1) % musicState.playlist.length; break; } playSong(nextIndex); }
+
+function playPrev() { if (musicState.playlist.length === 0) return; const newIndex = (musicState.currentIndex - 1 + musicState.playlist.length) % musicState.playlist.length; playSong(newIndex); }
+
+function changePlayMode() { const modes = ['order', 'random', 'single']; const currentModeIndex = modes.indexOf(musicState.playMode); musicState.playMode = modes[(currentModeIndex + 1) % modes.length]; document.getElementById('music-mode-btn').textContent = {'order': '顺序', 'random': '随机', 'single': '单曲'}[musicState.playMode]; }
+
+async function addSongFromURL() { const url = await showCustomPrompt("添加网络歌曲", "请输入歌曲的URL", "", "url"); if (!url) return; const name = await showCustomPrompt("歌曲信息", "请输入歌名"); if (!name) return; const artist = await showCustomPrompt("歌曲信息", "请输入歌手名"); if (!artist) return; musicState.playlist.push({ name, artist, src: url, isLocal: false }); await saveGlobalPlaylist(); updatePlaylistUI(); if(musicState.currentIndex === -1) { musicState.currentIndex = musicState.playlist.length - 1; updatePlayerUI(); } }
+
+// ▼▼▼ 【请用这个已修复的版本】完整替换旧的 addSongFromLocal 函数 ▼▼▼
+async function addSongFromLocal(event) {
+    const files = event.target.files;
+    if (!files.length) return;
+
+    for (const file of files) {
+        let name = file.name.replace(/\.[^/.]+$/, "");
+        name = await showCustomPrompt("歌曲信息", "请输入歌名", name);
+        if (name === null) continue;
+        
+        const artist = await showCustomPrompt("歌曲信息", "请输入歌手名", "未知歌手");
+        if (artist === null) continue;
+
+        // 【核心修复1】读取文件为 ArrayBuffer，这是最可靠的存储方式
+        const arrayBuffer = await file.arrayBuffer();
+
+        let lrcContent = "";
+        const wantLrc = await showCustomConfirm("导入歌词", `要为《${name}》添加歌词吗？`);
+        if (wantLrc) {
+            lrcContent = await getLrcContent() || "";
+        }
+        
+        musicState.playlist.push({ 
+            name, 
+            artist, 
+            src: arrayBuffer,           // 【核心修复2】存储 ArrayBuffer 而不是 File 对象
+            fileType: file.type,        // 【核心修复3】同时存储文件的MIME类型
+            isLocal: true,
+            lrcContent: lrcContent,
+            cover: 'https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1757748720126_qdqqd_1jt5sv.jpeg'
+        });
+    }
+    
+    await saveGlobalPlaylist();
+    updatePlaylistUI();
+    if (musicState.currentIndex === -1 && musicState.playlist.length > 0) {
+        musicState.currentIndex = 0;
+        updatePlayerUI();
+    }
+    event.target.value = null;
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【请用这个已修复的版本】完整替换旧的 playSong 函数 ▼▼▼
 async function playSong(index) {
     if (index < 0 || index >= musicState.playlist.length) return;
 
@@ -16189,9 +16257,11 @@ async function playSong(index) {
         if (!musicState.parsedLyrics || musicState.parsedLyrics.length === 0) {
             singleLyricEl.textContent = '纯音乐，请欣赏';
         } else {
-            singleLyricEl.textContent = '♪ ♪ ♪'; // 准备播放，显示音符
+            singleLyricEl.textContent = '♪ ♪ ♪'; 
         }
     }
+    
+    // 【核心修复4】优先处理 ArrayBuffer，并根据 fileType 创建 Blob
     if (track.isLocal && track.src instanceof ArrayBuffer) {
         const blob = new Blob([track.src], { type: track.fileType || 'audio/mpeg' });
         audioPlayer.src = URL.createObjectURL(blob);
@@ -16223,68 +16293,7 @@ async function playSong(index) {
         lyricBar.classList.remove('visible');
     }
 }
-
-async function togglePlayPause() {
-    if (audioPlayer.paused) {
-        if (musicState.currentIndex === -1 && musicState.playlist.length > 0) {
-            playSong(0);
-        } 
-        else if (musicState.currentIndex > -1) {
-            playSong(musicState.currentIndex);
-        }
-    } else {
-        audioPlayer.pause();
-        await addMusicActionSystemMessage('暂停了音乐');
-    }
-}
-
-function playNext() { if (musicState.playlist.length === 0) return; let nextIndex; switch(musicState.playMode) { case 'random': nextIndex = Math.floor(Math.random() * musicState.playlist.length); break; case 'single': playSong(musicState.currentIndex); return; case 'order': default: nextIndex = (musicState.currentIndex + 1) % musicState.playlist.length; break; } playSong(nextIndex); }
-
-function playPrev() { if (musicState.playlist.length === 0) return; const newIndex = (musicState.currentIndex - 1 + musicState.playlist.length) % musicState.playlist.length; playSong(newIndex); }
-
-function changePlayMode() { const modes = ['order', 'random', 'single']; const currentModeIndex = modes.indexOf(musicState.playMode); musicState.playMode = modes[(currentModeIndex + 1) % modes.length]; document.getElementById('music-mode-btn').textContent = {'order': '顺序', 'random': '随机', 'single': '单曲'}[musicState.playMode]; }
-
-async function addSongFromURL() { const url = await showCustomPrompt("添加网络歌曲", "请输入歌曲的URL", "", "url"); if (!url) return; const name = await showCustomPrompt("歌曲信息", "请输入歌名"); if (!name) return; const artist = await showCustomPrompt("歌曲信息", "请输入歌手名"); if (!artist) return; musicState.playlist.push({ name, artist, src: url, isLocal: false }); await saveGlobalPlaylist(); updatePlaylistUI(); if(musicState.currentIndex === -1) { musicState.currentIndex = musicState.playlist.length - 1; updatePlayerUI(); } }
-
-async function addSongFromLocal(event) {
-    const files = event.target.files;
-    if (!files.length) return;
-
-    for (const file of files) {
-        let name = file.name.replace(/\.[^/.]+$/, "");
-        name = await showCustomPrompt("歌曲信息", "请输入歌名", name);
-        if (name === null) continue;
-        
-        const artist = await showCustomPrompt("歌曲信息", "请输入歌手名", "未知歌手");
-        if (artist === null) continue;
-
-        const arrayBuffer = await file.arrayBuffer();
-
-        let lrcContent = "";
-        const wantLrc = await showCustomConfirm("导入歌词", `要为《${name}》添加歌词吗？`);
-        if (wantLrc) {
-            lrcContent = await handleManualLrcImport(musicState.playlist.length) || "";
-        }
-        
-        musicState.playlist.push({ 
-            name, 
-            artist, 
-            src: arrayBuffer,
-            fileType: file.type,
-            isLocal: true,
-            lrcContent: lrcContent,
-            cover: 'https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1757748720126_qdqqd_1jt5sv.jpeg'
-        });
-    }
-    
-    await saveGlobalPlaylist();
-    updatePlaylistUI();
-    if (musicState.currentIndex === -1 && musicState.playlist.length > 0) {
-        musicState.currentIndex = 0;
-        updatePlayerUI();
-    }
-    event.target.value = null;
-}
+// ▲▲▲ 替换结束 ▲▲▲
 
 async function deleteTrack(index) { if (index < 0 || index >= musicState.playlist.length) return; const track = musicState.playlist[index]; const wasPlaying = musicState.isPlaying && musicState.currentIndex === index; if (track.isLocal && audioPlayer.src.startsWith('blob:') && musicState.currentIndex === index) URL.revokeObjectURL(audioPlayer.src); musicState.playlist.splice(index, 1); await saveGlobalPlaylist(); if (musicState.playlist.length === 0) { if (musicState.isPlaying) audioPlayer.pause(); audioPlayer.src = ''; musicState.currentIndex = -1; musicState.isPlaying = false; } else { if (wasPlaying) { playNext(); } else { if (musicState.currentIndex >= index) musicState.currentIndex = Math.max(0, musicState.currentIndex - 1); } } updatePlayerUI(); updatePlaylistUI(); }
         
@@ -16927,7 +16936,7 @@ ${longTermMemoryContext}
         -   **发说说 (原创内容)**: '[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]'
         -   **【【【重要：转发动态】】】**: **严禁**自己拼接"//转发"文字！你【必须】使用此专用指令来转发：'[{"type": "repost", "postId": (要转发的动态ID), "comment": "你的转发评论..."}]'
         
--   **发布文字图**: '[{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体【中文】描述...", "image_prompt": "图片的【英文】关键词, 用%20分隔, 风格为风景/动漫/插画/二次元等, 禁止真人"}]'
+-   **发布文字图**: '[{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体【中文】描述...", "image_prompt": "图片的【英文】关键词, 用%20分隔, 风格只能为风景/动漫/插画/二次元等, 禁止生成真人"}]'
         -   **【【【评论动态的四种方式】】】**:
             -   **方式1 (单条文字)**: '[{"type": "qzone_comment", "name": "角色本名", "postId": 123, "commentText": "这太有趣了！"}]'
             -   **方式2 (多条文字)**: '[{"type": "qzone_comment", "name": "角色本名", "postId": 123, "comments": ["哇！", "这是什么？", "看起来好棒！"]}]'
@@ -17441,7 +17450,7 @@ ${longTermMemoryContext}
         # 你的可选行动指令:
         -   **发送文本**: '{"type": "text", "name": "角色本名", "content": "文本内容"}'
         -   **发送表情**: '{"type": "sticker", "name": "角色本名", "url": "...", "meaning": "..."}'
-        -   **发送图片**: '{"type": "ai_image", "name": "角色本名", "description": "图片的详细【中文】描述", "image_prompt": "图片的【英文】关键词, 用%20分隔, 风格为风景/动漫/插画/二次元等, 禁止真人"}'
+        -   **发送图片**: '{"type": "ai_image", "name": "角色本名", "description": "图片的详细【中文】描述", "image_prompt": "图片的【英文】关键词, 用%20分隔, 风格只能为风景/动漫/插画/二次元等, 禁止生成真人"}'
         -   **发起投票**: '{"type": "poll", "name": "角色本名", "question": "...", "options": "..."}'
         -   **发起群视频**: '{"type": "group_call_request", "name": "角色本名"}'
         -【【【全新】】】如何正确使用“引用回复”功能：
