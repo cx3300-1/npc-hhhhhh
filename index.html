@@ -7937,6 +7937,18 @@
                     <!-- 图标设置项将由JS动态生成在这里 -->
                 </div>
                 <!-- 【【【这就是补上的、缺失的全局CSS输入框！】】】 -->
+<!-- ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼ -->
+<!-- 【【【全新：全局CSS预设管理】】】 -->
+<h3 style="margin-top:0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; width:100%; text-align: left;">CSS 预设管理</h3>
+<div class="form-group" style="width:100%;">
+    <label for="css-preset-select">选择或切换预设</label>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <select id="css-preset-select" style="flex-grow: 1;"></select>
+        <button id="save-css-preset-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px;">保存</button>
+        <button id="delete-css-preset-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px; background-color: #ffebee; color: #d32f2f; border-color: #ffcdd2;">删除</button>
+    </div>
+</div>
+<!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
                 <hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
                 <div class="form-group" style="width:100%;">
                     <label for="global-css-input"> 全局美化样式 (CSS) <button id="reset-global-css-btn" type="button" style="background: none; border: 1px solid #ccc; color: #555; font-size: 12px; padding: 2px 8px; border-radius: 5px; cursor: pointer; margin-left: 10px;">重置</button>
@@ -7978,6 +7990,19 @@
                 <span style="width: 30px;"></span>
             </div>
             <div class="form-container">
+                <!-- ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼ -->
+                <!-- 【【【全新：字体预设管理】】】 -->
+                <h3 style="margin-top:0; border-bottom: 1px solid #eee; padding-bottom: 10px;">字体预设管理</h3>
+                <div class="form-group">
+                    <label for="font-preset-select">选择或切换预设</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="font-preset-select" style="flex-grow: 1;"></select>
+                        <button id="save-font-preset-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px;">保存</button>
+                        <button id="delete-font-preset-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px; background-color: #ffebee; color: #d32f2f; border-color: #ffcdd2;">删除</button>
+                    </div>
+                </div>
+                <hr style="margin: 30px 0; opacity: 0.3;">
+                <!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
                 <div class="form-group">
                     <label for="font-url-input">字体文件URL (.ttf, .otf, .woff等)</label>
                     <input type="text" id="font-url-input" placeholder="https://..../font.ttf">
@@ -8440,6 +8465,18 @@
             <label for="font-size-slider">聊天字体大小 <span id="font-size-value">13px</span></label>
             <input type="range" id="font-size-slider" min="12" max="20" step="1" value="13" style="width: 100%; margin-top: 8px;">
         </div>
+        <!-- ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼ -->
+        <!-- 【【【全新：气泡主题预设管理】】】 -->
+        <hr style="opacity: 0.3; margin: 20px 0;">
+        <div class="form-group">
+            <label for="theme-preset-select">主题预设管理</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <select id="theme-preset-select" style="flex-grow: 1;"></select>
+                <button id="save-theme-preset-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px;">保存</button>
+                <button id="delete-theme-preset-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px; background-color: #ffebee; color: #d32f2f; border-color: #ffcdd2;">删除</button>
+            </div>
+        </div>
+        <!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
         <div class="form-group">
             <label for="custom-css-input"> 自定义气泡样式 (CSS) <button id="reset-custom-css-btn" type="button" style="background: none; border: 1px solid #ccc; color: #555; font-size: 12px; padding: 2px 8px; border-radius: 5px; cursor: pointer; margin-left: 10px;">重置</button>
             </label>
@@ -10319,8 +10356,8 @@ commentActions.forEach(action => {
                 // 2. 数据库结构定义
                 // ===================================================================
         
-        // ▼▼▼ 【请用这个 V29 版本】完整替换旧的 db.version(...) 代码块 ▼▼▼
-        db.version(29).stores({ 
+        // ▼▼▼ 【请用这个 V30 版本】完整替换旧的 db.version(...) 代码块 ▼▼▼
+        db.version(30).stores({ 
             chats: '&id, isGroup, groupId, isPinned',
             apiConfig: '&id', 
             globalSettings: '&id', 
@@ -10339,7 +10376,9 @@ commentActions.forEach(action => {
             callRecords: '++id, chatId, timestamp, customName',
             shoppingProducts: '++id, name, description',
             apiPresets: '++id, name',
-            renderingRules: '++id, name, chatId'
+            renderingRules: '++id, name, chatId',
+            // 【【【核心新增】】】
+            appearancePresets: '++id, name, type' // 新增的表格，用于存储所有外观预设
         }).upgrade(tx => {
             // 这个升级函数会自动处理数据迁移
             return tx.table('worldBooks').toCollection().modify(book => {
@@ -10381,6 +10420,7 @@ commentActions.forEach(action => {
                     if (screenToShow) screenToShow.classList.add('active');
                     if (screenId === 'chat-interface-screen') window.updateListenTogetherIconProxy(state.activeChatId);
                     if (screenId === 'font-settings-screen') {
+            loadFontPresetsDropdown(); // <-- 新增这一行
                         document.getElementById('font-url-input').value = state.globalSettings.fontUrl || '';
                         applyCustomFont(state.globalSettings.fontUrl || '', true);
                     }
@@ -12588,6 +12628,7 @@ if (!state.globalSettings.widgetData) {
         
         // ▼▼▼ 用这个【新版本】替换旧的 renderWallpaperScreen 函数 ▼▼▼
         function renderWallpaperScreen() { 
+            loadCssPresetsDropdown(); // <-- 新增这一行
             const preview = document.getElementById('wallpaper-preview'); 
             const bg = newWallpaperBase64 || state.globalSettings.wallpaper; 
             if (bg && bg.startsWith('data:image')) { 
@@ -25840,6 +25881,268 @@ document.getElementById('thoughts-history-list').addEventListener('click', (e) =
 
 // ▲▲▲ 新增JS代码粘贴结束 ▲▲▲
 
+        // ▼▼▼ 【全新】全局CSS预设功能核心函数 ▼▼▼
+        
+        /**
+         * 从数据库加载CSS预设，并填充到下拉选择框中
+         */
+        async function loadCssPresetsDropdown() {
+            const selectEl = document.getElementById('css-preset-select');
+            selectEl.innerHTML = '<option value="">-- 选择一个预设 --</option>';
+            
+            const presets = await db.appearancePresets.where('type').equals('global_css').toArray();
+            presets.forEach(preset => {
+                const option = document.createElement('option');
+                option.value = preset.id;
+                option.textContent = preset.name;
+                selectEl.appendChild(option);
+            });
+        }
+        
+        /**
+         * 当用户从下拉框选择一个CSS预设时，加载该预设
+         */
+        async function handleCssPresetSelectionChange() {
+            const selectEl = document.getElementById('css-preset-select');
+            const selectedId = parseInt(selectEl.value);
+            if (isNaN(selectedId)) return;
+        
+            const preset = await db.appearancePresets.get(selectedId);
+            if (preset) {
+                const cssInput = document.getElementById('global-css-input');
+                cssInput.value = preset.value;
+                applyGlobalCss(preset.value); // 实时预览
+            }
+        }
+        
+        /**
+         * 将当前输入框中的CSS保存为一个新的预设
+         */
+        async function saveCssPreset() {
+            const name = await showCustomPrompt('保存CSS预设', '请输入预设名称');
+            if (!name || !name.trim()) return;
+        
+            const cssValue = document.getElementById('global-css-input').value;
+        
+            const existingPreset = await db.appearancePresets.where({ name: name.trim(), type: 'global_css' }).first();
+            if (existingPreset) {
+                const confirmed = await showCustomConfirm('覆盖预设', `名为 “${name.trim()}” 的预设已存在。要覆盖它吗？`, { confirmButtonClass: 'btn-danger' });
+                if (!confirmed) return;
+                
+                await db.appearancePresets.update(existingPreset.id, { value: cssValue });
+            } else {
+                await db.appearancePresets.add({
+                    name: name.trim(),
+                    type: 'global_css',
+                    value: cssValue
+                });
+            }
+        
+            await loadCssPresetsDropdown(); // 刷新下拉列表
+            alert('CSS 预设已保存！');
+        }
+        
+        /**
+         * 删除当前选中的CSS预设
+         */
+        async function deleteCssPreset() {
+            const selectEl = document.getElementById('css-preset-select');
+            const selectedId = parseInt(selectEl.value);
+        
+            if (isNaN(selectedId)) {
+                alert('请先从下拉框中选择一个要删除的预设。');
+                return;
+            }
+        
+            const preset = await db.appearancePresets.get(selectedId);
+            if (!preset) return;
+        
+            const confirmed = await showCustomConfirm('删除预设', `确定要删除预设 “${preset.name}” 吗？`, { confirmButtonClass: 'btn-danger' });
+            if (confirmed) {
+                await db.appearancePresets.delete(selectedId);
+                await loadCssPresetsDropdown(); // 刷新下拉列表
+                alert('预设已删除。');
+            }
+        }
+        // ▲▲▲ 新增函数结束 ▲▲▲
+        // ▼▼▼ 【全新】字体预设功能核心函数 ▼▼▼
+
+        /**
+         * 从数据库加载字体预设，并填充到下拉选择框中
+         */
+        async function loadFontPresetsDropdown() {
+            const selectEl = document.getElementById('font-preset-select');
+            selectEl.innerHTML = '<option value="">-- 选择一个预设 --</option>';
+            
+            const presets = await db.appearancePresets.where('type').equals('font').toArray();
+            presets.forEach(preset => {
+                const option = document.createElement('option');
+                option.value = preset.id;
+                option.textContent = preset.name;
+                selectEl.appendChild(option);
+            });
+        }
+
+        /**
+         * 当用户从下拉框选择一个字体预设时，加载该预设
+         */
+        async function handleFontPresetSelectionChange() {
+            const selectEl = document.getElementById('font-preset-select');
+            const selectedId = parseInt(selectEl.value);
+            if (isNaN(selectedId)) return;
+        
+            const preset = await db.appearancePresets.get(selectedId);
+            if (preset) {
+                const fontUrlInput = document.getElementById('font-url-input');
+                fontUrlInput.value = preset.value;
+                applyCustomFont(preset.value, true); // 实时预览
+            }
+        }
+        
+        /**
+         * 将当前输入框中的字体URL保存为一个新的预设
+         */
+        async function saveFontPreset() {
+            const name = await showCustomPrompt('保存字体预设', '请输入预设名称');
+            if (!name || !name.trim()) return;
+        
+            const fontUrl = document.getElementById('font-url-input').value.trim();
+            if (!fontUrl) {
+                alert("字体URL不能为空！");
+                return;
+            }
+        
+            const existingPreset = await db.appearancePresets.where({ name: name.trim(), type: 'font' }).first();
+            if (existingPreset) {
+                const confirmed = await showCustomConfirm('覆盖预设', `名为 “${name.trim()}” 的预设已存在。要覆盖它吗？`, { confirmButtonClass: 'btn-danger' });
+                if (!confirmed) return;
+                
+                await db.appearancePresets.update(existingPreset.id, { value: fontUrl });
+            } else {
+                await db.appearancePresets.add({
+                    name: name.trim(),
+                    type: 'font',
+                    value: fontUrl
+                });
+            }
+        
+            await loadFontPresetsDropdown();
+            alert('字体预设已保存！');
+        }
+        
+        /**
+         * 删除当前选中的字体预设
+         */
+        async function deleteFontPreset() {
+            const selectEl = document.getElementById('font-preset-select');
+            const selectedId = parseInt(selectEl.value);
+        
+            if (isNaN(selectedId)) {
+                alert('请先从下拉框中选择一个要删除的预设。');
+                return;
+            }
+        
+            const preset = await db.appearancePresets.get(selectedId);
+            if (!preset) return;
+        
+            const confirmed = await showCustomConfirm('删除预设', `确定要删除预设 “${preset.name}” 吗？`, { confirmButtonClass: 'btn-danger' });
+            if (confirmed) {
+                await db.appearancePresets.delete(selectedId);
+                await loadFontPresetsDropdown();
+                alert('预设已删除。');
+            }
+        }
+        // ▲▲▲ 新增函数结束 ▲▲▲
+        // ▼▼▼ 【全新】气泡主题预设功能核心函数 ▼▼▼
+
+        /**
+         * 从数据库加载气泡主题预设，并填充到下拉选择框中
+         */
+        async function loadThemePresetsDropdown() {
+            const selectEl = document.getElementById('theme-preset-select');
+            selectEl.innerHTML = '<option value="">-- 选择一个预设 --</option>';
+            
+            const presets = await db.appearancePresets.where('type').equals('bubble_theme').toArray();
+            presets.forEach(preset => {
+                const option = document.createElement('option');
+                option.value = preset.id;
+                option.textContent = preset.name;
+                selectEl.appendChild(option);
+            });
+        }
+
+        /**
+         * 当用户从下拉框选择一个主题预设时，加载该预设
+         */
+        async function handleThemePresetSelectionChange() {
+            const selectEl = document.getElementById('theme-preset-select');
+            const selectedId = parseInt(selectEl.value);
+            if (isNaN(selectedId)) return;
+        
+            const preset = await db.appearancePresets.get(selectedId);
+            if (preset) {
+                const themeRadio = document.querySelector(`input[name="theme-select"][value="${preset.value}"]`);
+                if (themeRadio) {
+                    themeRadio.checked = true;
+                    updateSettingsPreview(); // 实时更新预览
+                }
+            }
+        }
+        
+        /**
+         * 将当前选择的气泡主题保存为一个新的预设
+         */
+        async function saveThemePreset() {
+            const name = await showCustomPrompt('保存主题预设', '请输入预设名称');
+            if (!name || !name.trim()) return;
+        
+            const selectedThemeRadio = document.querySelector('input[name="theme-select"]:checked');
+            const themeValue = selectedThemeRadio ? selectedThemeRadio.value : 'default';
+        
+            const existingPreset = await db.appearancePresets.where({ name: name.trim(), type: 'bubble_theme' }).first();
+            if (existingPreset) {
+                const confirmed = await showCustomConfirm('覆盖预设', `名为 “${name.trim()}” 的预设已存在。要覆盖它吗？`, { confirmButtonClass: 'btn-danger' });
+                if (!confirmed) return;
+                
+                await db.appearancePresets.update(existingPreset.id, { value: themeValue });
+            } else {
+                await db.appearancePresets.add({
+                    name: name.trim(),
+                    type: 'bubble_theme',
+                    value: themeValue
+                });
+            }
+        
+            await loadThemePresetsDropdown();
+            alert('主题预设已保存！');
+        }
+        
+        /**
+         * 删除当前选中的主题预设
+         */
+        async function deleteThemePreset() {
+            const selectEl = document.getElementById('theme-preset-select');
+            const selectedId = parseInt(selectEl.value);
+        
+            if (isNaN(selectedId)) {
+                alert('请先从下拉框中选择一个要删除的预设。');
+                return;
+            }
+        
+            const preset = await db.appearancePresets.get(selectedId);
+            if (!preset) return;
+        
+            const confirmed = await showCustomConfirm('删除预设', `确定要删除预设 “${preset.name}” 吗？`, { confirmButtonClass: 'btn-danger' });
+            if (confirmed) {
+                await db.appearancePresets.delete(selectedId);
+                await loadThemePresetsDropdown();
+                alert('预设已删除。');
+            }
+        }
+        // ▲▲▲ 新增函数结束 ▲▲▲
+
+
+
                // ===================================================================
                 // 4. 初始化函数 init()
                 // ===================================================================
@@ -26676,6 +26979,7 @@ function updateChatListItem(chatId) {
                     window.addEventListener('click', (e) => { if (!document.querySelector('.custom-multiselect').contains(e.target)) { worldBookCheckboxesContainer.classList.remove('visible'); worldBookSelectBox.classList.remove('expanded'); } });
         // ▼▼▼ 【请用这个 V3.0 最终修复版】替换旧的 chat-settings-btn 事件监听器 ▼▼▼
         document.getElementById('chat-settings-btn').addEventListener('click', async () => {
+            loadThemePresetsDropdown(); // <-- 新增这一行
             if (!state.activeChatId) return;
             const chat = state.chats[state.activeChatId];
             const isGroup = chat.isGroup;
@@ -29845,6 +30149,22 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
     showScreen('home-screen');
 });
 // ▲▲▲ 新增代码结束 ▲▲▲
+        // ▼▼▼ 【全新】全局CSS预设功能事件监听器 ▼▼▼
+        document.getElementById('css-preset-select').addEventListener('change', handleCssPresetSelectionChange);
+        document.getElementById('save-css-preset-btn').addEventListener('click', saveCssPreset);
+        document.getElementById('delete-css-preset-btn').addEventListener('click', deleteCssPreset);
+        // ▲▲▲ 新增结束 ▲▲▲
+        // ▼▼▼ 【全新】字体预设功能事件监听器 ▼▼▼
+        document.getElementById('font-preset-select').addEventListener('change', handleFontPresetSelectionChange);
+        document.getElementById('save-font-preset-btn').addEventListener('click', saveFontPreset);
+        document.getElementById('delete-font-preset-btn').addEventListener('click', deleteFontPreset);
+        // ▲▲▲ 新增结束 ▲▲▲
+
+        // ▼▼▼ 【全新】气泡主题预设功能事件监听器 ▼▼▼
+        document.getElementById('theme-preset-select').addEventListener('change', handleThemePresetSelectionChange);
+        document.getElementById('save-theme-preset-btn').addEventListener('click', saveThemePreset);
+        document.getElementById('delete-theme-preset-btn').addEventListener('click', deleteThemePreset);
+        // ▲▲▲ 新增结束 ▲▲▲
                     showScreen('home-screen');
                 }
         
