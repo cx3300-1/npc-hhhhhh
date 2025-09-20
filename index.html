@@ -14415,8 +14415,11 @@ messagesPayload = historySlice.map(msg => {
     const sender = msg.role === 'user' ? myNickname : (msg.senderName || '未知');
     let prefix = `${sender}`;
     prefix += ` (Timestamp: ${msg.timestamp})`;
+    // 【核心修复】在这里，我们为引用消息构建了更完整的上下文
     if (msg.quote) {
-        prefix += ` (回复 ${msg.quote.senderName})`;
+        const quotedContent = String(msg.quote.content || '').substring(0, 50);
+        // 格式化为AI易于理解的格式，包含了被引用的内容
+        prefix += ` (回复 ${msg.quote.senderName} 的消息: "${quotedContent}...")`;
     }
     prefix += ': ';
     let content;
@@ -14861,11 +14864,17 @@ ${shoppingContext}
                             if (Array.isArray(msg.content) && msg.content[0]?.type === 'image_url') {
                                 return { role: 'user', content: [{ type: 'text', text: prefix }, ...msg.content] };
                             }
-                            if (msg.quote) {
-                                contentStr += `(回复 ${msg.quote.senderName}): ${msg.content}`;
-                            } else {
-                                contentStr += msg.content;
-                            }
+                                // 【核心修复】在这里，我们为引用消息构建了更完整的上下文
+    if (msg.quote) {
+        // 提取被引用的内容，并截断以防过长
+        const quotedContent = String(msg.quote.content || '').substring(0, 50);
+        // 格式化为AI易于理解的格式
+        contentStr += `(回复 ${msg.quote.senderName} 的消息: "${quotedContent}..."): ${msg.content}`;
+    } else {
+        // 如果不是引用，则保持原样
+        contentStr += msg.content;
+    }
+
                             if (msg.type === 'user_photo') return { role: 'user', content: `${prefix}[你发送了一张需要AI识别的图片，图片内容是：'${msg.content}']` };
                             if (msg.type === 'voice_message') return { role: 'user', content: `${prefix}[你发送了一条语音消息，内容是：'${msg.content}']` };
                             if (msg.type === 'transfer') return { role: 'user', content: `${prefix}[系统提示：你于时间戳 ${msg.timestamp} 向对方发起了转账: ${msg.amount}元, 备注: ${msg.note}。等待对方处理。]` };
