@@ -15580,7 +15580,16 @@ case 'qzone_post':
                             break;
                         case 'open_red_packet':
                             const packetToOpen = chat.history.find(m => m.timestamp === msgData.packet_timestamp);
-                            
+                           // ▼▼▼ 在这里添加全新的验证逻辑 ▼▼▼
+const claimerOriginalName = msgData.name; // 获取尝试抢红包的角色本名
+const isMember = chat.members.some(member => member.originalName === claimerOriginalName);
+
+// 如果这个角色不是当前群的成员，就记录一个警告并直接跳过，不允许他抢
+if (!isMember) {
+    console.warn(`AI 角色 "${claimerOriginalName}" 尝试领取不属于自己的群聊红包。操作已被拦截。`);
+    continue; // 跳过后续所有抢红包的逻辑
+}
+// ▲▲▲ 验证逻辑结束 ▲▲▲ 
                             if (packetToOpen && packetToOpen.packetType === 'direct') {
                                 if (packetToOpen.receiverName !== msgData.name) {
                                     console.warn(`AI 角色 "${msgData.name}" 尝试领取不属于自己的专属红包 (接收人: ${packetToOpen.receiverName})。操作已被拦截。`);
