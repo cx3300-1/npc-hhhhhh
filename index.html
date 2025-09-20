@@ -21498,48 +21498,89 @@ ${transcriptText}
     }
     // ▲▲▲ 核心修改到这里结束 ▲▲▲
 }
-// ▼▼▼ 【请用这个支持记忆互通的全新版本】替换旧的 summarizeExistingLongTermMemory 函数 ▼▼▼
+// ▼▼▼ 【全新 | V3.0 终极容错版】请用这一整块代码，完整替换旧的 summarizeExistingLongTermMemory 函数 ▼▼▼
+
 /**
- * 【全新V2.0 | 支持自定义字数 | 记忆互通版】手动触发对【现有长期记忆】的总结和精炼
- * @param {string} chatId - 当前聊天的ID (may be a group chat ID)
+ * 【辅助函数 | 容错核心】一个更健壮的JSON解析器
+ * 它能从AI返回的、可能不规范的文本中智能提取JSON对象或核心内容。
+ * @param {string} rawContent - AI返回的原始字符串
+ * @returns {object|null} - 返回解析后的对象，或在完全失败时返回null
+ */
+function robustJsonParse(rawContent) {
+    if (!rawContent || typeof rawContent !== 'string') {
+        return null;
+    }
+
+    const cleanedContent = rawContent.replace(/^```json\s*/, '').replace(/```$/, '').trim();
+
+    // 策略1：最高优先级，尝试直接解析完整的JSON对象
+    // 这能处理最标准的情况，以及AI在JSON前后添加了少量文字的情况。
+    const jsonMatch = cleanedContent.match(/{[\s\S]*}/);
+    if (jsonMatch) {
+        try {
+            const parsed = JSON.parse(jsonMatch[0]);
+            console.log("容错解析：策略1成功 (找到并解析了完整的JSON对象)");
+            return parsed;
+        } catch (e) {
+            console.warn("容错解析：策略1失败 (找到了JSON块，但格式错误)，将尝试策略2...");
+        }
+    }
+
+    // 策略2：如果策略1失败，尝试只提取 "summary" 字段的内容
+    // 这能处理AI返回了类似 "summary": "..." 这样的非标准格式
+    const summaryMatch = cleanedContent.match(/"summary"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (summaryMatch && summaryMatch[1]) {
+        console.log("容错解析：策略2成功 (提取了summary字段内容)");
+        // 手动构建一个符合我们期望格式的对象
+        return { summary: summaryMatch[1].replace(/\\"/g, '"') }; // 处理转义的引号
+    }
+    
+    // 策略3：最终备用方案，如果以上都失败了，就认为整个文本都是摘要
+    // 这能处理AI完全不听指令，直接返回纯文本的情况
+    if (cleanedContent) {
+        console.log("容错解析：策略3成功 (将整个返回文本作为摘要)");
+        return { summary: cleanedContent };
+    }
+
+    // 如果连文本都没有，才返回null
+    return null;
+}
+
+
+/**
+ * 【全新V3.0 | 支持自定义字数 | 记忆互通版 | 终极容错】手动触发对【现有长期记忆】的总结和精炼
+ * @param {string} chatId - 当前聊天的ID (可能是群聊ID)
  */
 async function summarizeExistingLongTermMemory(chatId) {
     let chat = state.chats[chatId];
     if (!chat) return;
 
-    let targetChatForRefine = chat; // By default, the target is the current chat
+    let targetChatForRefine = chat; 
 
-    // ▼▼▼ 核心修改：如果是群聊，就弹出选择框，让用户选择要为哪个角色精炼记忆 ▼▼▼
     if (chat.isGroup) {
-        // 1. 创建一个选项数组，只包含那些有足够记忆（2条以上）可供精炼的成员
         const memberOptions = chat.members
             .map(member => {
                 const memberChat = state.chats[member.id];
                 if (memberChat && memberChat.longTermMemory && memberChat.longTermMemory.length >= 2) {
                     return {
                         text: `精炼“${member.groupNickname}”的记忆 (${memberChat.longTermMemory.length}条)`,
-                        value: member.id // The value we want is the member's unique single-chat ID
+                        value: member.id
                     };
                 }
                 return null;
-            }).filter(Boolean); // This removes any null entries from the array
+            }).filter(Boolean); 
 
-        // 如果没有成员有足够的记忆，就提示用户并退出
         if (memberOptions.length === 0) {
             alert("群聊中没有成员有足够（2条以上）的记忆可供精炼。");
             return;
         }
 
-        // 2. 弹出选择框
         const selectedMemberId = await showChoiceModal('选择要精炼记忆的角色', memberOptions);
 
-        // 如果用户取消了选择，就直接退出
         if (!selectedMemberId) return;
 
-        // 3. 将我们的操作目标，从群聊本身，切换到被选中的那个角色
         targetChatForRefine = state.chats[selectedMemberId];
     }
-    // ▲▲▲ 修改结束 ▲▲▲
 
     if (!targetChatForRefine.longTermMemory || targetChatForRefine.longTermMemory.length < 2) {
         alert(`“${targetChatForRefine.name}”的长期记忆少于2条，无需进行精炼。`);
@@ -21571,7 +21612,6 @@ async function summarizeExistingLongTermMemory(chatId) {
     const memoryContent = targetChatForRefine.longTermMemory.map(mem => `- ${mem.content}`).join('\n');
     const userNickname = state.qzoneSettings.nickname || '用户';
 
-    // 构建一个专门用于“元总结”的、高度优化的AI指令
     const systemPrompt = `
 # 你的任务
 你是一个记忆整合专家。你的唯一任务是阅读下面提供的“记忆要点列表”，并将它们整合成一个更加精炼、连贯的核心记忆摘要。
@@ -21601,34 +21641,44 @@ ${memoryContent}
 
         const response = isGemini
             ? await fetch(geminiConfig.url, geminiConfig.data)
-            : await fetch(`${proxyUrl}/v1/chat/completions`, { /* ... API call details ... */ });
+            : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                body: JSON.stringify({
+                    model: model,
+                    messages: [{role: 'system', content: systemPrompt}, {role: 'user', content: "请开始整合。"}],
+                    temperature: 0.1,
+                    max_tokens: wordCount + 50 // 留出一些余量
+                })
+            });
 
         if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
 
         const data = await response.json();
-        let rawContent = isGemini ? getGeminiResponseText(data) : data.choices[0].message.content;
-        rawContent = rawContent.replace(/^```json\s*/, '').replace(/```$/, '').trim();
-        const result = JSON.parse(rawContent);
+        const rawContent = isGemini ? getGeminiResponseText(data) : data.choices[0].message.content;
 
-        if (result.summary && result.summary.trim()) {
+        // ★★★★★ 这就是最关键的修改！ ★★★★★
+        // 我们不再使用脆弱的 JSON.parse，而是调用我们全新的、强悍的解析函数。
+        const result = robustJsonParse(rawContent);
+        // ★★★★★ 修改结束 ★★★★★
+
+        if (result && result.summary && result.summary.trim()) {
             const newMemoryEntry = {
                 content: result.summary.trim(),
                 timestamp: Date.now(),
                 source: 'refined'
             };
 
-            // ▼▼▼ 核心修改：将新记忆保存到我们选定的目标角色档案中 ▼▼▼
             targetChatForRefine.longTermMemory = [newMemoryEntry];
             targetChatForRefine.lastMemorySummaryTimestamp = Date.now();
             await db.chats.put(targetChatForRefine);
-            // ▲▲▲ 修改结束 ▲▲▲
             
             if (document.getElementById('long-term-memory-screen').classList.contains('active')) {
                 renderLongTermMemoryList();
             }
             await showCustomAlert('精炼成功', `已成功将“${targetChatForRefine.name}”的记忆精炼为 1 条核心记忆！`);
         } else {
-            throw new Error("AI返回了空的或格式不正确的总结内容。");
+            throw new Error(`AI返回了空的或格式不正确的总结内容。原始返回: ${rawContent}`);
         }
 
     } catch (error) {
@@ -21636,6 +21686,7 @@ ${memoryContent}
         await showCustomAlert('精炼失败', `操作失败: ${error.message}`);
     }
 }
+// ▲▲▲ 替换结束 ▲▲▲
 // ▼▼▼ 【请用这个支持“个性化记忆注入”的最终版本】完整替换旧的 triggerAutoSummary 函数 ▼▼▼
 /**
  * 【核心】执行总结的API调用 (V7.1 - 个性化记忆注入 | 统一客观总结)
