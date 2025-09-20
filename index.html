@@ -13051,64 +13051,85 @@ if (!state.globalSettings.widgetData) {
             }
         }
         
-        /**
-         * 【核心逻辑】处理粘贴的文本，解析并存入数据库
-         * @param {string} text - 用户粘贴的文本内容
-         */
-        async function handleBatchStickerImport(text) {
-            const lines = text.trim().split('\n');
-            const newStickers = [];
-            const baseUrl = 'https://files.catbox.moe/';
-            let errorCount = 0;
+// ▼▼▼ 【全新升级版】请用这个函数完整替换旧的 handleBatchStickerImport 函数 ▼▼▼
+/**
+ * 【核心逻辑 | V2.0 - 兼容 postimg】处理粘贴的文本，解析并存入数据库
+ * @param {string} text - 用户粘贴的文本内容
+ */
+async function handleBatchStickerImport(text) {
+    const lines = text.trim().split('\n');
+    const newStickers = [];
+    const baseUrl = 'https://files.catbox.moe/'; // 保留，用于兼容旧格式
+    let errorCount = 0;
+
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+
+        // 跳过空行或示例行
+        if (!trimmedLine || trimmedLine.includes('填入')) {
+            continue; 
+        }
+
+        // ▼▼▼ 新增逻辑：优先匹配 “名称：URL” 格式 ▼▼▼
+        // 这个正则表达式可以匹配 “着急：https://...” 这样的格式
+        const fullUrlMatch = trimmedLine.match(/^(.+?)[:：]\s*(https?:\/\/.+)$/);
         
-            for (const line of lines) {
-                const trimmedLine = line.trim();
+        if (fullUrlMatch) {
+            const name = fullUrlMatch[1].trim();
+            const url = fullUrlMatch[2].trim();
+            newStickers.push({
+                id: 'sticker_' + Date.now() + Math.random(),
+                name: name,
+                url: url // 直接使用捕获到的完整URL
+            });
+            // 匹配成功，直接处理下一行
+            continue; 
+        }
+        // ▲▲▲ 新增逻辑结束 ▲▲▲
+
+        // ▼▼▼ 保留逻辑：如果上面没匹配成功，则尝试匹配旧的 catbox.moe 格式 ▼▼▼
+        let name = null;
+        let code = null;
+
+        const noSpaceMatch = trimmedLine.match(/^([\u4e00-\u9fa5]+)([a-zA-Z0-9]+\..+)$/);
         
-                if (!trimmedLine || trimmedLine.includes('http') || trimmedLine.includes('填入')) {
-                    continue; 
-                }
-        
-                let name = null;
-                let code = null;
-        
-                const noSpaceMatch = trimmedLine.match(/^([\u4e00-\u9fa5]+)([a-zA-Z0-9]+\..+)$/);
-                
-                if (noSpaceMatch) {
-                    name = noSpaceMatch[1];
-                    code = noSpaceMatch[2];
-                } else {
-                    const parts = trimmedLine.split(/\s+/);
-                    if (parts.length >= 2) {
-                        code = parts.pop();
-                        name = parts.join(' ');
-                    }
-                }
-        
-                if (name && code && code.includes('.')) {
-                    newStickers.push({
-                        id: 'sticker_' + Date.now() + Math.random(), // 确保ID唯一
-                        name: name,
-                        url: baseUrl + code
-                    });
-                } else {
-                    errorCount++;
-                    console.warn('批量导入格式错误，已跳过此行:', trimmedLine);
-                }
-            }
-        
-            if (errorCount > 0) {
-                await showCustomAlert('部分导入失败', `有 ${errorCount} 行的格式不正确，已被系统跳过。`);
-            }
-        
-            if (newStickers.length > 0) {
-                await db.userStickers.bulkAdd(newStickers);
-                state.userStickers.push(...newStickers);
-                renderStickerPanel(); // 刷新表情面板
-                await showCustomAlert('导入成功', `已成功批量导入 ${newStickers.length} 个新表情！`);
-            } else if (errorCount === 0) {
-                alert("没有找到可导入的内容。请检查您粘贴的格式是否正确。");
+        if (noSpaceMatch) {
+            name = noSpaceMatch[1];
+            code = noSpaceMatch[2];
+        } else {
+            const parts = trimmedLine.split(/\s+/);
+            if (parts.length >= 2) {
+                code = parts.pop();
+                name = parts.join(' ');
             }
         }
+
+        if (name && code && code.includes('.')) {
+            newStickers.push({
+                id: 'sticker_' + Date.now() + Math.random(),
+                name: name,
+                url: baseUrl + code // 使用旧格式的拼接URL
+            });
+        } else {
+            errorCount++;
+            console.warn('批量导入格式错误，已跳过此行:', trimmedLine);
+        }
+        // ▲▲▲ 保留逻辑结束 ▲▲▲
+    }
+
+    if (errorCount > 0) {
+        await showCustomAlert('部分导入失败', `有 ${errorCount} 行的格式不正确，已被系统跳过。`);
+    }
+
+    if (newStickers.length > 0) {
+        await db.userStickers.bulkAdd(newStickers);
+        state.userStickers.push(...newStickers);
+        renderStickerPanel(); // 刷新表情面板
+        await showCustomAlert('导入成功', `已成功批量导入 ${newStickers.length} 个新表情！`);
+    } else if (errorCount === 0) {
+        alert("没有找到可导入的内容。请检查您粘贴的格式是否正确。");
+    }
+}
         // ▲▲▲ 全新功能函数粘贴结束 ▲▲▲
         /**
          * 【全新】滚动到并高亮显示原始消息
@@ -30349,4 +30370,3 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 </body>
 </html>
-
