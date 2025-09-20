@@ -6969,6 +6969,228 @@
     color: #c62828;
 }
 /* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】心声/散记卡片票根样式 ▼▼▼ */
+
+/* 1. 为卡片主体设置相对定位和溢出隐藏，这是实现效果的基础 */
+#character-profile-modal .character-profile-content {
+    position: relative; /* 让伪元素可以相对于它定位 */
+    overflow: visible;  /* 【核心修改】允许伪元素“溢出”到外面一点，形成打孔效果 */
+    padding-bottom: 35px; /* 增加底部内边距，防止内容与底部打孔重叠 */
+}
+
+/* 2. 创建顶部的打孔效果 */
+#character-profile-modal .character-profile-content::before {
+    content: '';
+    position: absolute;
+    top: -10px; /* 向上移动，露出一半 */
+    left: 0;
+    right: 0;
+    height: 20px; /* 打孔条的高度 */
+    /* 核心：使用径向渐变创建重复的半圆形“孔” */
+    background-image: radial-gradient(circle at 50% 0, transparent 8px, #f0f2f5 8px);
+    background-size: 25px 20px; /* 控制每个孔的大小和间距 */
+    background-repeat: repeat-x;
+}
+
+/* 3. 创建底部的打孔效果 */
+#character-profile-modal .character-profile-content::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; /* 向下移动，露出一半 */
+    left: 0;
+    right: 0;
+    height: 20px; /* 打孔条的高度 */
+    /* 核心：与顶部类似，但圆心位置相反 */
+    background-image: radial-gradient(circle at 50% 100%, transparent 8px, #f0f2f5 8px);
+    background-size: 25px 20px; /* 控制每个孔的大小和间距 */
+    background-repeat: repeat-x;
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】票根样式美化 (直角 + 纯白背景) ▼▼▼ */
+
+/* 1. 覆盖主容器样式，改为直角和白色背景 */
+#character-profile-modal .character-profile-content {
+    border-radius: 0;         /* 核心修改1: 移除圆角，变为直角 */
+    background-color: #ffffff; /* 核心修改2: 将背景色改为纯白色 */
+}
+
+/* 2. 覆盖顶部打孔条的颜色，与新的白色背景统一 */
+#character-profile-modal .character-profile-content::before {
+    /* 核心修改3: 将打孔条的颜色从灰色改为纯白色 */
+    background-image: radial-gradient(circle at 50% 0, transparent 8px, #ffffff 8px);
+}
+
+/* 3. 覆盖底部打孔条的颜色，与新的白色背景统一 */
+#character-profile-modal .character-profile-content::after {
+    /* 核心修改4: 将打孔条的颜色也改为纯白色 */
+    background-image: radial-gradient(circle at 50% 100%, transparent 8px, #ffffff 8px);
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】为心声/散记卡片添加票根分割线 ▼▼▼ */
+
+/* 1. 为头部区域（时间戳）添加相对定位和空间，作为分割线的“锚点” */
+#character-profile-modal .thought-header {
+    position: relative;
+    width: 100%;
+    /* 增加底部内边距，为分割线创造空间 */
+    padding-bottom: 15px; 
+    /* 增加底部外边距，将下方的“心声”内容推开 */
+    margin-bottom: 25px; 
+    /* 这就是中间的灰色虚线 */
+    border-bottom: 2px dashed #e0e0e0; 
+}
+
+/* ▼▼▼ 【最终修复】票根分割线打孔透明效果 ▼▼▼ */
+
+
+/* 2. 重新创建左侧的“打孔”，使其颜色与页面背景一致 */
+#character-profile-modal .thought-header::before {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    left: -35px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    /* 核心修复：使用页面的背景色 (#f0f2f5) 来“伪装”透明效果 */
+    background-color:  rgba(0, 0, 0, 0.3);
+}
+
+/* 3. 重新创建右侧的“打孔” */
+#character-profile-modal .thought-header::after {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    right: -35px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    /* 核心修复：颜色与页面背景保持一致 */
+    background-color:  rgba(0, 0, 0, 0.3);
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【最终版】角色资料卡固定背景图样式 (直角) ▼▼▼ */
+
+/* ▼▼▼ 【最终图片显示修复】请用这整块代码替换旧的 .thought-header 样式 ▼▼▼ */
+#character-profile-modal .thought-header {
+    height: 140px;         /* 保持固定的、防压缩的高度 */
+    flex-shrink: 0;
+    padding: 10px;         /* 在图片四周留出“画框”边距 */
+    padding-bottom: 25px;  /* 加大底部边距，将图片与虚线分开 */
+    box-sizing: border-box;
+    border-bottom: 2px dashed #e0e0e0; /* 恢复虚线分割线 */
+    margin-bottom: 25px;
+    position: relative;     /* 保持，为了让打孔能正确定位 */
+
+    /* --- 核心修复：在这里重新添加背景图片 --- */
+    background-image: url('https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1758340625111_qdqqd_zqr2cl.jpeg'); /* <-- 请在这里替换为您自己的图片URL */
+    background-size: cover;
+    background-position: center top;
+    border-radius: 0;      /* 确保图片容器是直角的 */
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+/* 2. 移除之前为JS动态图片准备的样式（可选，但推荐） */
+#profile-photo-slot {
+    display: none; /* 隐藏掉JS可能创建的<img>标签 */
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【最终修复】隔离资料卡样式，防止泄露到历史记录 ▼▼▼ */
+
+/* ▼▼▼ 【最终修复】隔离资料卡样式，防止泄露到历史记录 ▼▼▼ */
+
+/* 1. 【核心】使用更精确的选择器，确保照片区域只出现在主资料页上 */
+#character-profile-modal #profile-main-content .thought-header {
+   // height: 120px;
+    //padding-bottom: 15px; /* 步骤1：保留足够的空间，将虚线向下推 */
+    box-sizing: border-box;
+    background-image: url('https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1758340625111_qdqqd_zqr2cl.jpeg');
+    background-size: cover;
+    background-position: center top;
+    border-bottom: 2px dashed #e0e0e0;
+    margin-bottom: 15px;
+    
+    /* ▼▼▼ 步骤2：这就是解决问题的关键！▼▼▼ */
+    /* 强制背景图只在内容区绘制，不要进入我们用padding撑开的空白区域 */
+    background-clip: content-box; 
+    -webkit-background-clip: content-box; /* 兼容旧版浏览器 */
+    /* ▲▲▲ 关键代码结束 ▲▲▲ */
+}
+
+/* 2. 【核心】确保打孔效果也只出现在主资料页上 */
+#character-profile-modal #profile-main-content .thought-header::before,
+#character-profile-modal #profile-main-content .thought-header::after {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+#character-profile-modal #profile-main-content .thought-header::before {
+    left: -35px;
+}
+#character-profile-modal #profile-main-content .thought-header::after {
+    right: -35px;
+}
+
+/* 3. 【重要】将历史记录页里的小卡片头部样式，强制恢复为原始的简洁样式 */
+#character-profile-modal #thoughts-history-list .thought-card .thought-header {
+    height: auto;
+    padding: 0;
+    padding-bottom: 8px; /* 恢复底部的小间距 */
+    margin-bottom: 12px;
+    background-image: none; /* 移除背景图 */
+    border: none; /* 移除所有边框 */
+    border-bottom: 1px solid #f0f0f0; /* 只保留底部的细分割线 */
+}
+
+/* 4. 【重要】在历史记录的小卡片上，强制隐藏掉打孔的伪元素 */
+#character-profile-modal #thoughts-history-list .thought-card .thought-header::before,
+#character-profile-modal #thoughts-history-list .thought-card .thought-header::after {
+    display: none !important; /* 强制不显示 */
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】心声/散记美化与字体修复 ▼▼▼ */
+
+/* 
+  第一步：强制显示“心声”和“散记”的标签。
+  我们使用 !important 来确保这条规则的优先级最高，
+  可以覆盖掉任何之前可能存在的 display: none; 隐藏规则。
+*/
+#character-profile-modal #profile-main-content .label {
+    display: flex !important;
+}
+
+/* 
+  第二步：为“心声”和“散记”的正文内容更换字体。
+  这里以常见的宋体(SimSun)为例，您可以替换成任何您喜欢的字体名称。
+*/
+#character-profile-modal #profile-main-content .text {
+    font-family: "SimSun", "Songti SC", serif; /* 示例：更换为宋体 */
+    font-size: 16px; /* (可选) 稍微放大字体，让宋体更清晰 */
+}
+
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【最终修复】强制将心声/散记内容变为纯黑色 ▼▼▼ */
+
+/* 1. 将“心声”和“散记”的标题文字和图标变为黑色 */
+#character-profile-modal .thought-content .label {
+    color: #000000 !important;
+}
+
+/* 2. 将“心声”和“散记”的正文段落文字变为黑色 */
+#character-profile-modal .thought-content .text {
+    color: #000000 !important;
+}
+
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
     </style>
 </head>
 <body>
