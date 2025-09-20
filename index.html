@@ -7106,7 +7106,7 @@
 /* 1. 【核心】使用更精确的选择器，确保照片区域只出现在主资料页上 */
 #character-profile-modal #profile-main-content .thought-header {
    // height: 120px;
-    //padding-bottom: 15px; /* 步骤1：保留足够的空间，将虚线向下推 */
+    padding-bottom: 15px; /* 步骤1：保留足够的空间，将虚线向下推 */
     box-sizing: border-box;
     background-image: url('https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1758340625111_qdqqd_zqr2cl.jpeg');
     background-size: cover;
@@ -7191,6 +7191,14 @@
 }
 
 /* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+
+
+
+/* ▼▼▼ 【全新】修复心声/资料卡页面左右滑动问题 ▼▼▼ */
+#character-profile-modal #profile-main-content {
+    overflow-x: hidden;
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
     </style>
 </head>
 <body>
