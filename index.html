@@ -8639,6 +8639,12 @@
         </div>
         <hr style="margin: 25px 0; border: none; border-top: 1px solid #eee;">
         <button class="form-button form-button-secondary" id="block-chat-btn" style="background-color: #ff3b30; color: white; border-color: #ff3b30;">拉黑对方</button>
+<!-- ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼ -->
+<hr style="margin: 25px 0; border: none; border-top: 1px solid #eee;">
+<button class="form-button form-button-secondary" id="export-single-chat-btn" style="background-color: #e8f5e9; color: #2e7d32; border-color: #c8e6c9;">导出该聊天</button>
+<button class="form-button form-button-secondary" id="import-single-chat-btn" style="background-color: #fff3e0; color: #ef6c00; border-color: #ffe0b2;">导入该聊天</button>
+<input type="file" id="import-single-chat-input" accept="application/json" hidden>
+<!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
         <button class="form-button form-button-secondary" id="clear-chat-btn">清空聊天记录</button>
     </div>
 </div>
@@ -21648,7 +21654,7 @@ ${memoryContent}
                     model: model,
                     messages: [{role: 'system', content: systemPrompt}, {role: 'user', content: "请开始整合。"}],
                     temperature: 0.1,
-                    max_tokens: wordCount + 50 // 留出一些余量
+                    max_tokens: wordCount + 500 // 留出一些余量
                 })
             });
 
@@ -26571,7 +26577,91 @@ document.getElementById('thoughts-history-list').addEventListener('click', (e) =
             if(selectAllCheckbox) selectAllCheckbox.checked = false;
         }
         // ▲▲▲ 替换结束 ▲▲▲
+/**
+ * 【全新】仅导出当前单个聊天的备份
+ */
+async function exportSingleChat() {
+    if (!state.activeChatId) return;
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
 
+    try {
+        const backupData = {
+            type: 'EPhoneSingleChat', // 特殊标记，用于导入时验证
+            version: 1,
+            chatData: chat
+        };
+
+        const blob = new Blob(
+            [JSON.stringify(backupData, null, 2)], 
+            { type: 'application/json' }
+        );
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        // 文件名将使用角色的备注名
+        link.download = `EPhone-Chat-${chat.name}-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+        
+        await showCustomAlert('导出成功', `与“${chat.name}”的聊天记录已成功导出！`);
+
+    } catch (error) {
+        console.error("导出单个聊天时出错:", error);
+        await showCustomAlert('导出失败', `发生了一个错误: ${error.message}`);
+    }
+}
+
+/**
+ * 【全新】将单个聊天的备份导入并覆盖当前聊天
+ * @param {File} file - 用户选择的 .json 备份文件
+ */
+async function importSingleChat(file) {
+    if (!file || !state.activeChatId) return;
+    const currentChatId = state.activeChatId;
+    const currentChat = state.chats[currentChatId];
+
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        // 1. 验证文件格式
+        if (data.type !== 'EPhoneSingleChat' || !data.chatData) {
+            throw new Error("文件格式不正确，这不是一个有效的单聊备份文件。");
+        }
+
+        // 2. 弹出最终警告
+        const confirmed = await showCustomConfirm(
+            '严重警告！',
+            `这将用备份文件中的数据【完全覆盖】当前与“${currentChat.name}”的聊天记录和设置。此操作不可撤销！<br><br><strong>确定要继续吗？</strong>`,
+            { confirmButtonClass: 'btn-danger', confirmText: '确认覆盖' }
+        );
+
+        if (!confirmed) return;
+
+        // 3. 执行覆盖操作
+        const importedChatData = data.chatData;
+        
+        // 保持当前的ID不变，只用导入的数据覆盖内容
+        importedChatData.id = currentChatId; 
+        
+        // 更新数据库和内存状态
+        await db.chats.put(importedChatData);
+        state.chats[currentChatId] = importedChatData;
+
+        // 4. 成功提示并刷新
+        await showCustomAlert('导入成功', '聊天记录已成功覆盖！正在刷新界面...');
+        
+        // 刷新UI
+        renderChatInterface(currentChatId);
+        renderChatList();
+        document.getElementById('chat-settings-btn').click(); // 重新打开设置以显示最新数据
+
+    } catch (error) {
+        console.error("导入单个聊天时出错:", error);
+        await showCustomAlert('导入失败', `文件解析或应用失败: ${error.message}`);
+    }
+}
 
 
                // ===================================================================
@@ -30658,6 +30748,21 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
 
         // ▲▲▲ 新增事件绑定结束 ▲▲▲
 document.getElementById('select-all-stickers-checkbox').addEventListener('change', handleSelectAllStickers);
+// ▼▼▼ 【全新】单个聊天导入导出事件绑定 ▼▼▼
+document.getElementById('export-single-chat-btn').addEventListener('click', exportSingleChat);
+
+document.getElementById('import-single-chat-btn').addEventListener('click', () => {
+    document.getElementById('import-single-chat-input').click();
+});
+
+document.getElementById('import-single-chat-input').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        importSingleChat(file);
+    }
+    e.target.value = null; // 清空以便下次能选择同一个文件
+});
+// ▲▲▲ 新增代码结束 ▲▲▲
                     showScreen('home-screen');
                 }
         
