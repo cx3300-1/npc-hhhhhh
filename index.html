@@ -22920,94 +22920,53 @@ function updateMusicProgressBar() {
             }
         }
         // ▲▲▲ 替换结束 ▲▲▲
+        // ▼▼▼ 【最终修复版】请用这个全新的函数，完整替换旧的 showAnnouncementBoard 函数 ▼▼▼
         /**
-         * 显示群公告板弹窗
+         * 【V2.0 | 已修复异步渲染BUG】显示群公告板弹窗
          */
-        // ▼▼▼ 【全新版本】显示公告板函数 (支持多条与管理) ▼▼▼
-        function showAnnouncementBoard() {
-        // ▼▼▼ 【全新】公告管理核心功能 ▼▼▼
-        let activeAnnouncementId = null; // 用于暂存正在操作的公告ID
-        
-        function showAnnouncementActions(annoId) {
-            activeAnnouncementId = annoId;
-            const chat = state.chats[state.activeChatId];
-            const announcement = chat.announcements.find(a => a.id === annoId);
-            if (!announcement) return;
-        
-            const pinButton = document.getElementById('announcement-action-pin');
-            pinButton.textContent = announcement.isPinned ? '取消置顶' : '置顶公告';
-        
-            document.getElementById('announcement-actions-modal').classList.add('visible');
-        }
-        
-        async function handlePinAnnouncement() {
-            if (!activeAnnouncementId) return;
-            const chat = state.chats[state.activeChatId];
-            const announcement = chat.announcements.find(a => a.id === activeAnnouncementId);
-            if (announcement) {
-                announcement.isPinned = !announcement.isPinned; // 切换置顶状态
-                await db.chats.put(chat);
-                showAnnouncementBoard(); // 重新渲染公告板以更新UI
-            }
-            document.getElementById('announcement-actions-modal').classList.remove('visible');
-        }
-        
-        async function handleDeleteAnnouncement() {
-            if (!activeAnnouncementId) return;
-        
-            const confirmed = await showCustomConfirm("确认删除", "确定要删除这条公告吗？此操作不可恢复。", { confirmButtonClass: 'btn-danger' });
-        
-            if (confirmed) {
-                const chat = state.chats[state.activeChatId];
-                chat.announcements = chat.announcements.filter(a => a.id !== activeAnnouncementId);
-                await db.chats.put(chat);
-                showAnnouncementBoard(); // 重新渲染
-            }
-            document.getElementById('announcement-actions-modal').classList.remove('visible');
-        }
-        // ▲▲▲ 新函数粘贴结束 ▲▲▲
+        async function showAnnouncementBoard() { // <--- 核心修复1：将函数声明为 async
             const chat = state.chats[state.activeChatId];
             const announcements = chat.announcements || [];
-        
+
             if (!chat || announcements.length === 0) {
                 showCustomAlert("提示", "当前群聊还没有公告哦。");
                 return;
             }
-        
+
             const contentEl = document.getElementById('announcement-board-content');
             contentEl.innerHTML = '';
-        
+
             // 将置顶的公告排在最前面
             announcements.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
-        
-            announcements.forEach(anno => {
+
+            // 【核心修复2】使用 for...of 循环，以便在循环内部安全地使用 await
+            for (const anno of announcements) {
                 const originalMessage = chat.history.find(m => m.timestamp === anno.messageTimestamp);
-        
+
                 const wrapper = document.createElement('div');
                 wrapper.className = 'announcement-item-wrapper';
-        
+
                 if (originalMessage) {
-                    const messageBubbleEl = createMessageElement(originalMessage, chat);
-                    wrapper.appendChild(messageBubbleEl);
+                    // 【核心修复3】在这里使用 await，等待 createMessageElement 函数真正完成并返回HTML元素
+                    const messageBubbleEl = await createMessageElement(originalMessage, chat);
+                    if (messageBubbleEl) { // 安全检查，确保元素已成功创建
+                        wrapper.appendChild(messageBubbleEl);
+                    }
                 } else {
                     wrapper.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">公告的原消息已被删除。</p>';
                 }
-        
-                // 添加置顶标志
+
                 if (anno.isPinned) {
                     wrapper.innerHTML += `<div class="pinned-indicator">📌</div>`;
                 }
-        
-                // 添加“...”操作按钮
                 wrapper.innerHTML += `<div class="announcement-item-actions" data-anno-id="${anno.id}">...</div>`;
-        
+
                 contentEl.appendChild(wrapper);
-            });
-        
+            }
+
             document.getElementById('announcement-board-modal').classList.add('visible');
         }
         // ▲▲▲ 替换结束 ▲▲▲
-        // ▲▲▲ 新函数粘贴结束 ▲▲▲
         // ▼▼▼ 【这是您缺失的核心功能代码，请粘贴在这里】 ▼▼▼
         let activeAnnouncementId = null; // 用于暂存正在操作的公告ID
         
