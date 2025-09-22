@@ -10561,14 +10561,14 @@
             <div class="modal-header">
                 <span id="transcript-modal-title">通话详情</span>
             </div>
-            <div class="modal-body" id="transcript-modal-body" style="background-color: #f0f2f5;">
+            <div class="modal-body" id="call-transcript-modal-body" style="background-color: #f0f2f5;">
                 <!-- 通话文字记录将由JS动态生成在这里 -->
             </div>
             <div class="modal-footer">
                 <button class="cancel" id="delete-transcript-btn" style="background-color: #ff3b30; color: white; border-color: #ff3b30;">删除记录</button>
                 <!-- 【【【核心新增】】】 -->
                 <button class="save" id="manual-summarize-btn" style="background-color: #ffc107; border-color: #ffc107;">手动总结</button>
-                <button class="save" id="close-transcript-modal-btn" style="width: 100%;">关闭</button>
+                <button class="save" id="close-call-transcript-btn" style="width: 100%;">关闭</button>
             </div>
         </div>
     </div>
@@ -23550,7 +23550,7 @@ async function showCallTranscript(recordId) {
 
     const modal = document.getElementById('call-transcript-modal');
     const titleEl = document.getElementById('transcript-modal-title');
-    const bodyEl = document.getElementById('transcript-modal-body');
+   const bodyEl = document.getElementById('call-transcript-modal-body');
 
     titleEl.textContent = `通话于 ${new Date(record.timestamp).toLocaleString()} (时长: ${Math.floor(record.duration / 60)}分${record.duration % 60}秒)`;
     bodyEl.innerHTML = '';
@@ -23625,7 +23625,18 @@ async function showCallTranscript(recordId) {
         }
     });
     // ▲▲▲ 核心修改到这里结束 ▲▲▲
+// ▼▼▼ 【这是您需要添加的核心修复代码】 ▼▼▼
 
+// 3. 为“关闭”按钮也创建克隆并绑定事件，确保它总是可用
+const closeBtn = document.getElementById('close-transcript-modal-btn');
+const newCloseBtn = closeBtn.cloneNode(true);
+closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+
+newCloseBtn.addEventListener('click', () => {
+    modal.classList.remove('visible');
+});
+
+// ▲▲▲ 新增代码粘贴结束 ▲▲▲
     modal.classList.add('visible');
 }
         
@@ -33446,10 +33457,9 @@ async function handlePostClick(e) {
             }
         });
         
-        // 4. 关闭详情弹窗的逻辑保持不变
-        document.getElementById('close-transcript-modal-btn').addEventListener('click', () => {
-            document.getElementById('call-transcript-modal').classList.remove('visible');
-        });
+document.getElementById('close-call-transcript-btn').addEventListener('click', () => {
+    document.getElementById('call-transcript-modal').classList.remove('visible');
+});
         
         // ▲▲▲ 替换结束 ▲▲▲
         
@@ -34693,4 +34703,5 @@ document.getElementById('regenerate-char-usage-btn').addEventListener('click', h
 <audio id="char-audio-player" preload="auto"></audio>
 </body>
 </html>
+
 
