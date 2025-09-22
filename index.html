@@ -7304,6 +7304,1029 @@
             color: white;
         }
         /* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新 V2.0】角色手机功能的所有CSS样式 ▼▼▼ */
+
+/* --- 1. 角色选择界面 (保持不变) --- */
+#character-selection-screen { background-color: #f0f2f5; }
+#phone-screen.dark-mode #character-selection-screen { background-color: #000; }
+/* --- 请用这一整块【全新】的CSS，替换旧的 #character-grid 和 .character-select-item 相关的所有样式 --- */
+
+/* 1. 将网格容器变为列表容器 */
+#character-grid {
+    /* 移除了 display: grid 和相关属性 */
+    padding: 0; /* 移除内边距，由列表项自己控制 */
+    overflow-y: auto; /* 确保内容超出时可以滚动 */
+    flex-grow: 1;
+}
+
+/* 2. 修改每个列表项的布局，从垂直变为水平 */
+.character-select-item {
+    display: flex;
+    flex-direction: row;     /* 核心修改：从 column 变为 row */
+    align-items: center;     /* 保持垂直居中 */
+    cursor: pointer;
+    padding: 12px 20px;      /* 增加内边距，形成列表项外观 */
+    border-bottom: 1px solid var(--border-color); /* 添加分割线 */
+    gap: 15px;               /* 在头像和名字之间增加间距 */
+    transition: background-color 0.2s; /* 添加悬停效果 */
+    /* 移除了 text-align: center */
+}
+.character-select-item:hover {
+    background-color: #f5f5f5; /* 鼠标悬停时高亮 */
+}
+
+
+/* 3. 调整头像大小和样式 */
+.character-select-item .avatar {
+    width: 45px;             /* 核心修改：缩小头像尺寸 */
+    height: 45px;
+    border-radius: 50%;      /* 改为圆形，更适合列表视图 */
+    object-fit: cover;
+    margin-bottom: 0;        /* 移除底部外边距 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;          /* 防止头像被压缩 */
+}
+
+/* 4. 调整名字样式 */
+.character-select-item .name {
+    font-weight: 500;
+    font-size: 16px;         /* 稍微增大字体，提高可读性 */
+    color: var(--text-primary);
+}
+/* --- 替换结束 --- */
+
+/* --- 2. 角色手机主容器与屏幕切换 (保持不变) --- */
+#character-phone-screen { background-size: cover; background-position: center; }
+.char-screen { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; overflow: hidden; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+.char-screen.active { opacity: 1; visibility: visible; z-index: 2; }
+
+/* --- 3. 角色手机主屏幕 (保持不变) --- */
+#char-home-screen { justify-content: flex-start; align-items: center; box-sizing: border-box; padding: 0 20px; }
+#char-clock-container { text-align: center; color: white; text-shadow: 0 3px 8px rgba(0,0,0,0.4); margin-top: calc(60px + env(safe-area-inset-top)); flex-shrink: 0; margin-bottom: 100px; }
+#char-main-time { font-size: 88px; font-weight: 600; letter-spacing: -2px; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
+#char-main-date { font-size: 22px; font-weight: normal; }
+#char-app-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+
+/* --- 4. 角色手机内的App通用背景色 (已扩展) --- */
+#char-qq-screen, #char-memo-screen, #char-diary-screen, #char-usage-screen, 
+#char-album-screen, #char-browser-screen, #char-taobao-screen {
+     background-color: var(--secondary-bg);
+}
+
+/* --- 5. 备忘录、日记、使用记录列表样式 (保持不变) --- */
+.memo-item, .diary-item, .usage-item { padding: 15px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+.memo-item .content, .diary-item .content { font-size: 16px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.diary-item .date, .usage-item .timestamp { font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; }
+.usage-item .action { font-size: 15px; color: var(--text-primary); }
+
+/* --- 6. 【全新】角色相册样式 --- */
+#char-album-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 每行3张图 */
+    gap: 5px;
+    padding: 5px;
+}
+.char-photo-item {
+    aspect-ratio: 1 / 1; /* 保持正方形 */
+    background-size: cover;
+    background-position: center;
+    background-color: #e9ecef;
+}
+
+/* --- 7. 【全新】角色浏览器历史样式 --- */
+.char-browser-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+.char-browser-item .title {
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+.char-browser-item .url {
+    font-size: 12px;
+    color: var(--accent-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- 8. 【全新】角色淘宝页面样式 (复用主购物页样式) --- */
+#char-product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+}
+.char-product-item {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+}
+.char-product-item .product-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+}
+.char-product-item .product-info {
+    padding: 12px 10px;
+    flex-grow: 1;
+}
+.char-product-item .product-name {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.4;
+    min-height: 36px;
+}
+.char-product-item .product-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ff5722;
+    margin-top: 8px;
+}
+.char-product-item .product-price::before { content: '¥'; font-size: 12px; }
+
+/* ▲▲▲ 全新CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【全新V2.0】角色手机QQ模拟功能样式 ▼▼▼ */
+#char-qq-screen .list-container {
+    padding: 0; /* 移除容器的内边距 */
+}
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【全新】角色手机QQ模拟聊天记录弹窗样式 ▼▼▼ */
+
+/* 1. 让弹窗内容区拥有和主聊天界面一样的布局 */
+#transcript-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* 消息气泡之间的间距 */
+    padding: 15px; /* 内边距 */
+    background-color: #f0f2f5;
+}
+
+/* 2. 夜间模式适配 */
+#phone-screen.dark-mode #transcript-modal-body {
+    background-color: #000000;
+}
+
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【全新V2.0 | 最终布局修复】请用这整块代码，替换掉您上一次粘贴的 #char-chat-list 相关的CSS ▼▼▼ */
+
+/* 1. 为两个列表的列表项（主QQ列表和角色QQ列表）设置统一的 Flexbox 布局 */
+#chat-list .chat-list-item,
+#char-chat-list .chat-list-item {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* 【核心修复1】使用 gap 属性在头像和文字之间创建间距，这比 margin 更现代、更可靠 */
+}
+
+/* 2. 确保头像容器（无论在哪一个列表中）都绝对不会被压缩 */
+#chat-list .chat-list-item .avatar-group,
+#char-chat-list .chat-list-item .avatar-group {
+    flex-shrink: 0;
+    /* 移除了旧的 margin-right，因为现在由父元素的 gap 属性统一控制间距 */
+}
+
+/* 3. 确保文字信息区域（无论在哪一个列表中）都能够正确地伸缩 */
+#chat-list .chat-list-item .info,
+#char-chat-list .chat-list-item .info {
+    flex-grow: 1;
+    min-width: 0; /* 关键！允许容器收缩，从而防止内部的长文字撑破布局导致重叠 */
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+/* ▼▼▼ 【全新】角色手机QQ模拟对话页面美化样式 ▼▼▼ */
+
+/* 1. 让弹窗内容区拥有和主聊天界面一样的布局 */
+#char-qq-conversation-screen .list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* <-- 核心：添加20px的间距 */
+    padding: 15px; /* <-- 新增：在四周增加内边距，避免气泡贴边 */
+    background-color: #f0f2f5;
+}
+
+/* 2. 夜间模式适配 */
+#phone-screen.dark-mode #char-qq-conversation-screen .list-container {
+    background-color: #000000;
+}
+/* ▼▼▼ 【全新】角色手机App通用背景色 (已修复) ▼▼▼ */
+#char-qq-screen, 
+#char-memo-screen, 
+#char-diary-screen, 
+#char-usage-screen, 
+#char-album-screen, 
+#char-browser-screen, 
+#char-taobao-screen,
+/* --- 【核心修复】将新的文章页面也加入这个规则，确保它有正确的背景色 --- */
+#char-browser-article-screen {
+     background-color: var(--secondary-bg);
+}
+/* ▲▲▲ 修复结束 ▲▲▲ */
+/* ▼▼▼ 【全新】角色手机App通用背景色 (已修复钱包页面) ▼▼▼ */
+#char-qq-screen, 
+#char-memo-screen, 
+#char-diary-screen, 
+#char-usage-screen, 
+#char-album-screen, 
+#char-browser-screen, 
+#char-taobao-screen,
+#char-browser-article-screen,
+/* --- 【核心修复】将新的钱包页面也加入这个规则，确保它有正确的背景色 --- */
+#char-wallet-screen {
+     background-color: var(--secondary-bg);
+}
+/* ▲▲▲ 修复结束 ▲▲▲ */
+/* ▼▼▼ 【全新】角色手机备忘录详情页样式 ▼▼▼ */
+
+#char-memo-detail-content {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+    line-height: 1.7; /* 增加行高，更易读 */
+    padding: 15px 20px; /* 增加左右内边距 */
+    box-sizing: border-box;
+    resize: none; /* 禁止用户拖动调整大小 */
+    outline: none; /* 移除选中时的蓝色边框 */
+    font-family: inherit; /* 继承页面字体 */
+    color: var(--text-primary); /* 确保文字颜色能适配夜间模式 */
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】角色手机备忘录详情页美化 (仿iOS Notes App) ▼▼▼ */
+
+/* 1. 让详情页拥有自己的、能适配夜间模式的背景色 */
+#char-memo-detail-screen {
+    background-color: var(--secondary-bg);
+}
+
+/* 2. 美化头部，添加分割线，并调整内边距 */
+#char-memo-detail-screen .header {
+    background-color: var(--secondary-bg); /* 与页面背景色统一 */
+    border-bottom: 1px solid var(--border-color); /* 添加精致的分割线 */
+    
+    padding-bottom: 10px;
+}
+
+/* 3. 【核心】强制标题居中显示 */
+#char-memo-detail-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 600; /* 标题加粗 */
+}
+
+/* 4. 移除内容容器的默认内边距，让文本区能撑满 */
+#char-memo-detail-screen .form-container {
+    padding: 0;
+}
+
+/* 5. 美化文本区域，使其看起来像一个真正的笔记页面 */
+#char-memo-detail-content {
+    background-color: var(--secondary-bg); /* 背景色与头部统一，形成整体感 */
+    padding: 15px 20px; /* 增加顶部和左右的内边距，让文字有呼吸空间 */
+    font-size: 17px; /* 仿iOS备忘录的字体大小 */
+    line-height: 1.7; /* 更宽松的行高，提升阅读体验 */
+    color: var(--text-primary);
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】角色手机日记详情页“信纸”样式 ▼▼▼ */
+
+/* 1. 详情页主屏幕，使用柔和的米白色背景 */
+#char-diary-detail-screen {
+    background-color: #FDFBF5; /* 柔和的信纸底色 */
+}
+
+/* 夜间模式下的适配 */
+#phone-screen.dark-mode #char-diary-detail-screen {
+    background-color: #2c2c2e; /* 深色背景 */
+}
+
+/* 2. 移除内容区的默认内边距，让我们的“信纸”能撑满 */
+#char-diary-detail-content-wrapper {
+    padding: 0;
+    overflow-y: auto; /* 确保长日记可以滚动 */
+}
+
+/* 3. “信纸”本身的核心样式 */
+#char-diary-detail-content {
+    padding: 25px 20px; /* 在信纸四周留出舒适的边距 */
+    font-family: Georgia, 'Times New Roman', Times, serif; /* 使用更典雅的衬线字体 */
+    font-size: 16px;
+    line-height: 1.8; /* 更大的行高，提升阅读感 */
+    color: #383838; /* 使用深灰色文字，比纯黑更柔和 */
+}
+
+/* 夜间模式下的文字颜色 */
+#phone-screen.dark-mode #char-diary-detail-content {
+    color: #e0e0e0;
+}
+
+/* 4. 为日记的第一行（通常是标题）设置特殊样式 */
+#char-diary-detail-content > p:first-of-type {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 5. 确保Markdown转换后的标签样式正确 */
+#char-diary-detail-content strong {
+    font-weight: 600; /* 加粗 */
+}
+#char-diary-detail-content .spoiler {
+    /* 这里的样式与主聊天界面保持一致 */
+    background-color: #333;
+    color: #333;
+    padding: 0 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+#char-diary-detail-content .spoiler:hover {
+    background-color: #e0e0e0;
+    color: inherit;
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】日记详情页自定义Markdown样式 ▼▼▼ */
+
+/* 0. 引入外部手写字体 (Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap');
+
+/* 1. 黄色背景高亮 */
+#char-diary-detail-content .diary-highlight {
+    background-color: #FFFACD; /* 柠檬绸色，一种柔和的黄色 */
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin: 0 2px;
+}
+
+/* 2. 粉色虚线下划线 */
+#char-diary-detail-content .diary-underline {
+    border-bottom: 2px dotted #FFB6C1; /* 浅粉色 */
+    text-decoration: none; /* 移除默认的实线下划线 */
+    padding-bottom: 1px;
+}
+
+/* 3. 粉红色加粗文字 */
+#char-diary-detail-content .diary-emphasis {
+    color: #DB7093; /* 灰紫色 */
+    font-weight: bold;
+}
+
+/* 4. 手写体黑色文字 */
+#char-diary-detail-content .diary-handwritten {
+    font-family: 'Zhi Mang Xing', cursive; /* 应用手写字体 */
+    font-size: 1.1em; /* 手写体稍微大一点更好看 */
+    color: #1a1a1a; /* 比纯黑更柔和的深灰色 */
+}
+
+/* 5. 稍微倾斜的手写体文字 */
+#char-diary-detail-content .diary-messy {
+    font-family: 'Zhi Mang Xing', cursive;
+    font-size: 1.1em;
+    color: #1a1a1a;
+    transform: rotate(-2deg); /* 轻微旋转 */
+    display: inline-block; /* 旋转需要 display 属性配合 */
+    margin: 0 2px;
+}
+
+/* 6. 被涂黑的内容 */
+#char-diary-detail-content .diary-censored {
+    background-color: #222;
+    color: #222; /* 让文字颜色和背景色一样，实现涂黑效果 */
+    user-select: none; /* 防止用户通过选中来查看内容 */
+    padding: 0 3px;
+    border-radius: 2px;
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+.diary-censored:hover, .diary-censored:active {
+  background-color: #E0E0E0; /* 鼠标悬停时变成浅灰色背景 */
+  color: inherit; /* 恢复为正常的文字颜色 */
+  cursor: pointer; /* 鼠标变为可点击的手型 */
+}
+/* ▼▼▼ 【全新】角色高德地图功能样式 ▼▼▼ */
+
+/* 1. 主屏幕背景色 */
+#char-amap-screen {
+    background-color: #f0f2f5;
+}
+#phone-screen.dark-mode #char-amap-screen {
+    background-color: #000000;
+}
+
+/* 2. 足迹列表容器 */
+#char-amap-list {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px; /* 增加足迹之间的间距 */
+}
+
+/* 3. 单个足迹卡片 */
+.char-amap-item {
+    background-color: var(--secondary-bg);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column; /* 让内容垂直排列 */
+}
+
+/* 4. 卡片头部 (图标 + 地点信息) */
+.amap-item-header {
+    display: flex;
+    align-items: flex-start; /* 图标和文字顶部对齐 */
+    gap: 12px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+}
+
+/* 5. 地点图标 */
+.amap-item-icon {
+    font-size: 24px;
+    color: var(--accent-color);
+    margin-top: 2px;
+}
+
+/* 6. 地点信息 (标题 + 地址) */
+.amap-item-info {
+    flex-grow: 1;
+}
+.amap-item-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+.amap-item-address {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* 7. 卡片主体 (评论 + 图片) */
+.amap-item-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.amap-item-comment {
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap; /* 支持换行 */
+}
+
+/* 8. 足迹附带的图片 */
+.amap-item-photo {
+    width: 100%;
+    height: 150px;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+}
+
+/* 9. 卡片底部 (时间戳) */
+.amap-item-footer {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    text-align: right;
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】角色App使用记录功能样式 ▼▼▼ */
+
+/* 1. 列表容器 */
+#char-usage-list {
+    padding: 10px 0; /* 上下留白，左右由列表项控制 */
+}
+
+/* 2. 单个App记录项 */
+.char-usage-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 20px;
+    transition: background-color 0.2s;
+}
+.char-usage-item:hover {
+    background-color: rgba(0,0,0,0.03);
+}
+
+/* 3. App图标 */
+.usage-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px; /* iOS风格的圆角矩形 */
+    object-fit: cover;
+    flex-shrink: 0;
+    background-color: #e9ecef;
+}
+
+/* 4. 中间信息区 (App名 + 分类) */
+.usage-item-info {
+    flex-grow: 1; /* 占据所有剩余空间 */
+}
+.usage-item-name {
+    font-weight: 500;
+    font-size: 16px;
+}
+.usage-item-category {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* 5. 右侧时长显示 */
+.usage-item-time {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】角色网易云音乐功能样式 ▼▼▼ */
+
+/* 1. 主屏幕背景色 */
+#char-music-screen {
+    background-color: #f0f2f5;
+}
+#phone-screen.dark-mode #char-music-screen {
+    background-color: #000000;
+}
+
+/* 2. 歌曲列表容器 */
+#char-music-list {
+    padding: 0;
+}
+
+/* 3. 单个歌曲列表项 (仿网易云风格) */
+.char-music-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+.char-music-item:hover {
+    background-color: rgba(0,0,0,0.03);
+}
+
+/* 4. 歌曲封面 */
+.music-item-cover {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* 5. 歌曲信息 (歌名 + 歌手) */
+.music-item-info {
+    flex-grow: 1;
+    overflow: hidden; /* 防止长文本溢出 */
+}
+.music-item-name {
+    font-weight: 500;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.music-item-artist {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 这是你要【添加】到 <style> 标签末尾的【全新播放器CSS代码】 ▼▼▼ */
+
+/* 1. 播放器主窗口样式 */
+#char-music-player-modal .modal-content {
+    width: 400px !important; /* 固定宽度 */
+    height: auto !important; /* 高度自适应 */
+    max-height: 90vh;
+    background-color: #f7f8fa !important; /* 浅灰色背景 */
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+    color: #333 !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 2. 头部标题栏 */
+#char-music-player-modal .char-player-header {
+    flex-shrink: 0;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+#char-music-player-modal .char-player-close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #aaa;
+    cursor: pointer;
+}
+#char-music-player-modal .char-player-close-btn:hover {
+    color: #333;
+}
+
+
+/* 3. 主内容区（封面、进度条、按钮） */
+#char-music-player-modal .char-player-body {
+    padding: 30px 35px 20px 35px;
+    text-align: center;
+}
+#char-music-player-modal #char-music-cover {
+    width: 220px;
+    height: 220px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    margin-bottom: 20px;
+    object-fit: cover;
+}
+
+/* 4. 进度条样式 */
+#char-music-player-modal .char-player-progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+#char-music-player-modal .char-player-progress-bar {
+    flex-grow: 1;
+    height: 4px;
+    background-color: #e0e0e0;
+    border-radius: 2px;
+    cursor: pointer;
+}
+#char-music-player-modal #char-music-progress-fill {
+    width: 0%;
+    height: 100%;
+    background-color: #555;
+    border-radius: 2px;
+}
+
+/* 5. 控制按钮样式 */
+#char-music-player-modal .char-player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+#char-music-player-modal .char-player-controls .control-btn {
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#char-music-player-modal .char-player-controls .control-btn:hover {
+    color: #000;
+}
+#char-music-player-modal .char-player-controls .control-btn.play {
+    width: 50px;
+    height: 50px;
+    background-color: #f0f1f3;
+    border-radius: 50%;
+    color: #333;
+}
+#char-music-player-modal .char-player-controls .control-btn.mode {
+    font-size: 14px;
+    font-weight: 500;
+    width: 50px;
+}
+
+/* 6. 歌词区域样式 */
+#char-music-player-modal #char-music-lyrics {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 0 35px 25px 35px;
+    font-size: 14px;
+    line-height: 2;
+    color: #888;
+    text-align: center;
+}
+#char-music-player-modal #char-music-lyrics p.active {
+    color: #000;
+    font-weight: 600;
+}
+
+/* 隐藏滚动条 */
+#char-music-player-modal #char-music-lyrics::-webkit-scrollbar {
+    display: none;
+}
+#char-music-player-modal #char-music-lyrics {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 这是你要【添加】到 <style> 标签末尾的【全新播放器CSS V3.0】 ▼▼▼ */
+
+/* 1. 定义唱片旋转动画 */
+@keyframes spin-vinyl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 2. 播放器主窗口样式 */
+#char-music-player-modal .modal-content {
+    width: 340px !important; /* 宽度适中 */
+    height: auto !important;
+    background-color: #f0f1f3 !important; /* 轻柔的灰色背景 */
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+    color: #333 !important;
+    display: flex;
+    flex-direction: column;
+    padding: 20px; /* 统一内边距 */
+    position: relative;
+}
+
+/* 3. 移除旧的头部，因为关闭按钮已独立 */
+#char-music-player-modal .modal-header {
+    display: none !important;
+}
+
+/* 4. 右上角关闭按钮 */
+#char-music-player-modal .char-player-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: 300;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+}
+
+/* 5. 主内容区 */
+#char-music-player-modal .char-player-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+}
+
+/* 6. 歌曲信息 */
+#char-music-player-modal .char-player-song-info {
+    text-align: center;
+    margin-bottom: 25px;
+}
+#char-music-player-modal #char-music-player-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+}
+#char-music-player-modal #char-music-artist {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+}
+
+/* 7. 黑胶唱片效果 */
+#char-music-player-modal #char-vinyl-container {
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
+    background-color: #222;
+    padding: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2), 
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+    background-image: repeating-radial-gradient(circle, #333, #333 1px, #222 1px, #222 2px);
+    box-sizing: border-box;
+    margin-bottom: 25px;
+}
+#char-music-player-modal #char-vinyl-container.spinning {
+    animation: spin-vinyl 12s linear infinite;
+}
+#char-music-player-modal #char-music-cover {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 8. 歌词占位符 (音符) */
+#char-music-player-modal #char-lyric-placeholder {
+    color: #aaa;
+    font-size: 18px;
+    letter-spacing: 5px;
+    margin-bottom: 25px;
+}
+
+/* 9. 底部控制栏 */
+#char-music-player-modal .char-player-footer {
+    width: 100%;
+    margin-top: auto; /* 将其推到底部 */
+}
+
+/* 10. 进度条和控制按钮 (与上一版类似，但class已更新) */
+#char-music-player-modal .char-player-progress-bar-container {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+#char-music-player-modal .char-player-progress-bar {
+    flex-grow: 1; height: 4px; background-color: #e0e0e0; border-radius: 2px; cursor: pointer;
+}
+#char-music-player-modal #char-music-progress-fill {
+    width: 0%; height: 100%; background-color: #555; border-radius: 2px;
+}
+#char-music-player-modal .char-player-controls {
+    display: flex; align-items: center; justify-content: center; gap: 20px;
+}
+#char-music-player-modal .char-player-controls .control-btn {
+    background: none; border: none; color: #555; cursor: pointer; transition: color 0.2s; padding: 5px;
+    display: flex; align-items: center; justify-content: center;
+}
+#char-music-player-modal .char-player-controls .control-btn:hover { color: #000; }
+#char-music-player-modal .char-player-controls .control-btn.play {
+    width: 50px; height: 50px; background-color: #e0e1e3; border-radius: 50%; color: #333;
+}
+#char-music-player-modal .char-player-controls .control-btn.mode {
+    font-size: 14px; font-weight: 500; width: 50px;
+}
+#char-music-player-modal #char-music-lyrics {
+    display: none; /* 在这个版本中，我们彻底隐藏歌词区域 */
+}
+
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 这是你要【添加】到 <style> 标签末尾的【全新播放器CSS V3.0】 ▼▼▼ */
+
+/* 1. 定义唱片旋转动画 */
+@keyframes spin-vinyl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 2. 播放器主窗口样式 */
+#char-music-player-modal .modal-content {
+    width: 340px !important; /* 宽度适中 */
+    height: auto !important;
+    background-color: #f0f1f3 !important; /* 轻柔的灰色背景 */
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+    color: #333 !important;
+    display: flex;
+    flex-direction: column;
+    padding: 20px; /* 统一内边距 */
+    position: relative;
+}
+
+/* 3. 移除旧的头部，因为关闭按钮已独立 */
+#char-music-player-modal .modal-header {
+    display: none !important;
+}
+
+/* 4. 右上角关闭按钮 */
+#char-music-player-modal .char-player-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: 300;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+}
+
+/* 5. 主内容区 */
+#char-music-player-modal .char-player-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+}
+
+/* 6. 歌曲信息 */
+#char-music-player-modal .char-player-song-info {
+    text-align: center;
+    margin-bottom: 25px;
+}
+#char-music-player-modal #char-music-player-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+}
+#char-music-player-modal #char-music-artist {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+}
+
+/* 7. 黑胶唱片效果 */
+#char-music-player-modal #char-vinyl-container {
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
+    background-color: #222;
+    padding: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2), 
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+    background-image: repeating-radial-gradient(circle, #333, #333 1px, #222 1px, #222 2px);
+    box-sizing: border-box;
+    margin-bottom: 25px;
+}
+#char-music-player-modal #char-vinyl-container.spinning {
+    animation: spin-vinyl 12s linear infinite;
+}
+#char-music-player-modal #char-music-cover {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 8. 【核心新增】歌词区域样式 */
+#char-music-player-modal #char-music-lyrics {
+    width: 100%;
+    height: 50px; /* 设定一个固定高度，用于显示约两行歌词 */
+    overflow: hidden; /* 隐藏超出部分的歌词 */
+    position: relative;
+    margin-bottom: 25px;
+    font-size: 14px;
+    line-height: 25px; /* 设置行高 */
+    color: #888;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+#char-music-player-modal #char-music-lyrics p {
+    margin: 0;
+    transition: all 0.3s ease;
+}
+
+#char-music-player-modal #char-music-lyrics p.active {
+    color: #000;
+    font-weight: 600;
+    font-size: 16px; /* 当前行歌词放大一点 */
+}
+
+
+/* 9. 底部控制栏 */
+#char-music-player-modal .char-player-footer {
+    width: 100%;
+    margin-top: auto; /* 将其推到底部 */
+}
+
+/* 10. 进度条和控制按钮 */
+#char-music-player-modal .char-player-progress-bar-container {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+#char-music-player-modal .char-player-progress-bar {
+    flex-grow: 1; height: 4px; background-color: #e0e0e0; border-radius: 2px; cursor: pointer;
+}
+#char-music-player-modal #char-music-progress-fill {
+    width: 0%; height: 100%; background-color: #555; border-radius: 2px;
+}
+#char-music-player-modal .char-player-controls {
+    display: flex; align-items: center; justify-content: center; gap: 20px;
+}
+#char-music-player-modal .char-player-controls .control-btn {
+    background: none; border: none; color: #555; cursor: pointer; transition: color 0.2s; padding: 5px;
+    display: flex; align-items: center; justify-content: center;
+}
+#char-music-player-modal .char-player-controls .control-btn:hover { color: #000; }
+#char-music-player-modal .char-player-controls .control-btn.play {
+    width: 50px; height: 50px; background-color: #e0e1e3; border-radius: 50%; color: #333;
+}
+#char-music-player-modal .char-player-controls .control-btn.mode {
+    font-size: 14px; font-weight: 500; width: 50px;
+}
+
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+#chat-list .chat-list-item {
+    /* 核心1：强制使用 gap 属性来控制间距，并覆盖旧有冲突 */
+    gap: 15px !important;
+    /* 确保没有其他对齐方式干扰 */
+    justify-content: flex-start !important;
+}
+
+#chat-list .chat-list-item .avatar-group {
+    /* 核心2：强制移除之前用于间距的 margin，现在完全由 gap 控制 */
+    margin-right: 0 !important;
+}
     </style>
 </head>
 <body>
@@ -7396,13 +8419,357 @@
             <div class="icon-bg-desktop"><img id="icon-img-font" src="https://i.postimg.cc/pXxk1JXk/IMG-6442.jpg" alt="字体"></div>
             <span class="label">字体</span>
         </div>
-
+<!-- ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼ -->
+<div class="desktop-app-icon" onclick="openCharacterSelector()">
+    <div class="icon-bg-desktop"><img id="icon-img-char-phone" src="https://i.postimg.cc/pXj9h20L/IMG-7275.jpg" alt="角色手机"></div>
+    <span class="label">Cphone</span>
+</div>
+<!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
     
     </div>
 </div>
 
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+<!-- ▼▼▼ 【全新】角色手机功能的所有HTML屏幕 ▼▼▼ -->
 
+<!-- 1. 角色选择屏幕 -->
+<div id="character-selection-screen" class="screen">
+    <div class="header">
+        <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
+        <span>选择一部手机</span>
+        <span style="width: 30px;"></span>
+    </div>
+    <div id="character-grid" class="list-container">
+        <!-- 角色列表将由JS动态生成在这里 -->
+    </div>
+</div>
+
+<!-- ▼▼▼ 【V3.0 全新版本】请用这整块代码，完整替换旧的 #character-phone-screen ▼▼▼ -->
+<div id="character-phone-screen" class="screen">
+    
+    <!-- 1. 角色手机 - 主屏幕 (这是它应该在的位置，作为独立的页面) -->
+    <div id="char-home-screen" class="char-screen active">
+        <div id="char-clock-container">
+            <div id="char-main-time">12:00</div>
+            <div id="char-main-date">1月1日 星期一</div>
+        </div>
+        <div id="char-app-grid">
+            <div class="app-row">
+                <!-- 【图标修复】已将所有失效链接替换为可靠链接 -->
+                <div class="app-icon" onclick="openCharApp('qq')"><div class="icon-bg"><img src="https://i.postimg.cc/MTC3Tkw8/IMG-6436.jpg"></div><span class="label">QQ</span></div>
+                <div class="app-icon" onclick="openCharApp('album')"><div class="icon-bg"><img src="https://i.postimg.cc/HWf1JKzn/IMG-6435.jpg"></div><span class="label">相册</span></div>
+                <div class="app-icon" onclick="openCharApp('browser')"><div class="icon-bg"><img src="https://i.postimg.cc/KzC2gTq6/IMG-7276.jpg"></div><span class="label">浏览器</span></div>
+                <div class="app-icon" onclick="openCharApp('taobao')"><div class="icon-bg"><img src="https://i.postimg.cc/L6R7x16R/IMG-7278.jpg"></div><span class="label">淘宝</span></div>
+            </div>
+            <div class="app-row">
+                <div class="app-icon" onclick="openCharApp('memo')"><div class="icon-bg"><img src="https://i.postimg.cc/J0b6Nym4/IMG-7279.jpg"></div><span class="label">备忘录</span></div>
+                <div class="app-icon" onclick="openCharApp('diary')"><div class="icon-bg"><img src="https://i.postimg.cc/DZ541sbt/IMG-7280.jpg"></div><span class="label">日记</span></div>
+                <div class="app-icon" onclick="openCharApp('amap')"><div class="icon-bg"><img src="https://i.postimg.cc/Jz2Tz0dw/IMG-7281.jpg"></div><span class="label">高德地图</span></div>
+                <div class="app-icon" onclick="openCharApp('usage')"><div class="icon-bg"><img src="https://i.postimg.cc/WbF8kzz9/IMG-7282.jpg"></div><span class="label">App记录</span></div>
+            </div>
+            <div class="app-row">
+        <!-- ▼▼▼ 【核心新增】在这里粘贴网易云音乐的图标 ▼▼▼ -->
+        <div class="app-icon" onclick="openCharApp('music')"><div class="icon-bg"><img src="https://is1-ssl.mzstatic.com/image/thumb/Purple112/v4/64/9d/21/649d21e8-a151-6136-3914-256e54f15d9a/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/1200x630wa.png"></div><span class="label">网易云</span></div>
+        <!-- ▲▲▲ 新增结束 ▲▲▲ -->
+                <div class="app-icon" onclick="switchToMyPhone()"><div class="icon-bg"><img src="https://i.postimg.cc/pXj9h20L/IMG-7275.jpg"></div><span class="label">Ephone</span></div>
+            </div>
+        </div>
+    </div>
+<div id="char-amap-screen" class="char-screen">
+    <div class="header">
+        <span class="back-btn" onclick="switchToCharHomeScreen()">‹</span>
+        <span>足迹</span>
+        <div class="header-actions">
+            <span class="action-btn" id="regenerate-char-amap-btn" title="重新生成足迹">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+            </span>
+        </div>
+    </div>
+    <div id="char-amap-list" class="list-container">
+        <!-- 足迹列表将由JS动态生成在这里 -->
+    </div>
+</div>
+    <!-- 2. 角色手机 - QQ App 列表页 -->
+    <div id="char-qq-screen" class="char-screen">
+        <div class="header">
+            <span class="back-btn" onclick="switchToCharHomeScreen()">‹</span>
+            <span>QQ</span>
+            <div class="header-actions">
+                <span class="action-btn" id="regenerate-char-qq-btn" title="重新生成">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div id="char-chat-list" class="list-container"></div>
+    </div>
+    
+    <!-- 3. 角色手机 - 模拟对话页面 -->
+    <div id="char-qq-conversation-screen" class="char-screen">
+        <div class="header">
+            <span class="back-btn" id="back-to-char-qq-list-btn">‹</span>
+            <span id="char-conversation-partner-name"></span>
+            <span style="width: 30px;"></span>
+        </div>
+        <div id="char-conversation-messages" class="list-container">
+        </div>
+        <div id="char-conversation-input-area" style="padding: 8px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; background-color: #f7f7f7;">
+            <input type="text" id="char-simulated-input" placeholder="这是模拟对话，无法发送消息" disabled style="flex-grow: 1; padding: 10px; border-radius: 6px; border: 1px solid #ddd; background: #eee;">
+            <button id="char-simulated-send-btn" style="padding: 0 20px; border: none; background-color: var(--accent-color); color: white; border-radius: 6px; font-weight: 500;">发送</button>
+        </div>
+    </div>
+    
+    <!-- 4. 角色手机 - 相册 App 页面 (这是它应该在的位置，与主屏幕平级) -->
+    <div id="char-album-screen" class="char-screen">
+        <div class="header">
+            <span class="back-btn" onclick="switchToCharHomeScreen()">‹</span>
+            <span>TA的相册</span>
+            <div class="header-actions">
+                <span class="action-btn" id="regenerate-char-album-btn" title="重新生成相册内容">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div class="list-container">
+            <div id="char-album-grid"></div>
+        </div>
+    </div>
+
+<!-- ▼▼▼ 【全新V2.0 | 支持文章/图片】请用这整块代码，替换旧的 #char-browser-screen ▼▼▼ -->
+<div id="char-browser-screen" class="char-screen">
+    <div class="header">
+        <span class="back-btn" onclick="switchToCharHomeScreen()">‹</span>
+        <span>TA的浏览器历史</span>
+        <!-- 【核心新增】重新生成按钮 -->
+        <div class="header-actions">
+            <span class="action-btn" id="regenerate-char-browser-btn" title="重新生成浏览记录">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+            </span>
+        </div>
+    </div>
+    <div id="char-browser-history" class="list-container">
+        <!-- 浏览记录将由JS动态生成在这里 -->
+    </div>
+</div>
+
+<!-- 【【【核心新增：全新的文章查看页面】】】 -->
+<div id="char-browser-article-screen" class="char-screen">
+    <div class="header">
+        <span class="back-btn" onclick="switchToCharScreen('char-browser-screen')">‹</span>
+        <span id="char-article-title" style="max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">文章</span>
+        <span style="width: 30px;"></span>
+    </div>
+    <div id="char-article-content" class="list-container" style="padding: 20px; font-size: 16px; line-height: 1.8; color: #333; overflow-y: auto;">
+        <!-- 文章或图片内容将由JS动态生成在这里 -->
+    </div>
+</div>
+<!-- ▼▼▼ 【全新V2.0 | 支持钱包】请用这整块代码，完整替换旧的 #char-taobao-screen ▼▼▼ -->
+<div id="char-taobao-screen" class="char-screen">
+    <div class="header">
+        <span class="back-btn" onclick="switchToCharHomeScreen()">‹</span>
+        <span>TA的淘宝订单</span>
+        <div class="header-actions">
+            
+            <!-- 【核心新增2】重新生成按钮 -->
+            <span class="action-btn" id="regenerate-char-taobao-btn" title="重新生成购买记录">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+            </span>
+        </div>
+    </div>
+    <!-- 购买记录列表 (复用旧的grid，但内容会是动态的) -->
+    <div id="char-product-grid" class="list-container"></div>
+</div>
+
+
+<div id="char-memo-screen" class="char-screen">
+    <div class="header">
+        <span class="back-btn" onclick="switchToCharHomeScreen()">‹</span>
+        <span>备忘录</span>
+        <div class="header-actions">
+            <!-- 【核心新增】重新生成按钮 -->
+            <span class="action-btn" id="regenerate-char-memo-btn" title="重新生成备忘录">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+            </span>
+            <span class="action-btn" id="add-char-memo-btn">+</span>
+        </div>
+    </div>
+    <!-- 【核心修改】确保列表有内边距，更美观 -->
+    <div id="char-memo-list" class="list-container" style="padding: 10px;"></div>
+</div>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
+<!-- ▼▼▼ 在 #char-memo-screen 的 div 之后，粘贴这个全新的备忘录详情屏幕 ▼▼▼ -->
+<div id="char-memo-detail-screen" class="char-screen">
+    <div class="header">
+        <!-- 这个返回按钮会带我们回到备忘录列表 -->
+        <span class="back-btn" id="char-memo-detail-back-btn">‹</span>
+        <!-- 这里会动态显示备忘录的标题 -->
+        <span id="char-memo-detail-title"></span>
+        <!-- 右上角的占位符，保持标题居中 -->
+        <span style="width: 80px;"></span>
+    </div>
+    <!-- 这个容器将用来显示备忘录的完整内容 -->
+    <div class="form-container" style="padding: 0;">
+        <textarea id="char-memo-detail-content" readonly></textarea>
+    </div>
+</div>
+<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
+<!-- ▼▼▼ 用这整块新代码替换旧的 #char-diary-screen ▼▼▼ -->
+<div id="char-diary-screen" class="char-screen">
+    <div class="header">
+        <span class="back-btn" onclick="switchToCharHomeScreen()">‹</span>
+        <span>日记</span>
+        <div class="header-actions">
+            <!-- 【核心新增】重新生成按钮 -->
+            <span class="action-btn" id="regenerate-char-diary-btn" title="重新生成日记本">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+            </span>
+            <!-- 【核心修改】这个“+”号现在会触发AI写一篇新日记 -->
+            <span class="action-btn" id="add-char-diary-btn">+</span>
+        </div>
+    </div>
+    <div id="char-diary-list" class="list-container"></div>
+</div>
+
+<!-- 【【【核心新增：全新的日记详情屏幕】】】 -->
+<div id="char-diary-detail-screen" class="char-screen">
+    <div class="header">
+        <span class="back-btn" id="char-diary-detail-back-btn">‹ </span>
+        <span id="char-diary-detail-title"></span>
+        <span style="width: 50px;"></span>
+    </div>
+    <div id="char-diary-detail-content-wrapper" class="list-container">
+        <div id="char-diary-detail-content">
+            <!-- 日记内容将由JS动态生成在这里 -->
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
+<!-- ▼▼▼ 【请用这个V2.0版本】完整替换旧的 id="char-usage-screen" 的 div ▼▼▼ -->
+<div id="char-usage-screen" class="char-screen">
+    <div class="header">
+        <span class="back-btn" onclick="switchToCharHomeScreen()">‹</span>
+        <span>App使用记录</span>
+        <div class="header-actions">
+            <!-- 【核心新增】重新生成按钮 -->
+            <span class="action-btn" id="regenerate-char-usage-btn" title="重新生成记录">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+            </span>
+        </div>
+    </div>
+    <div id="char-usage-list" class="list-container">
+        <!-- App使用记录将由JS动态生成在这里 -->
+    </div>
+</div>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
+    <!-- 模拟聊天记录的弹窗 (保持不变) -->
+    <div id="char-qq-transcript-modal" class="modal">
+        <div class="modal-content" style="height: 80%;">
+            <div class="modal-header">
+                <span id="transcript-modal-char-name"></span>
+            </div>
+            <div class="modal-body" id="transcript-modal-body" style="background-color: #f0f2f5; padding: 15px; display: flex; flex-direction: column; gap: 15px;">
+            </div>
+            <div class="modal-footer">
+                <button class="save" id="close-transcript-modal-btn" style="width:100%;">关闭</button>
+            </div>
+        </div>
+    </div>
+<!-- ▼▼▼ 步骤 1-2：将这整块全新的“网易云音乐”屏幕和播放器，完整粘贴到 id="character-phone-screen" 的 div 内部末尾 ▼▼▼ -->
+
+<!-- 1. 网易云音乐App主屏幕 -->
+<div id="char-music-screen" class="char-screen">
+    <div class="header">
+        <span class="back-btn" onclick="switchToCharHomeScreen()">‹</span>
+        <span>TA的歌单</span>
+        <div class="header-actions">
+            <span class="action-btn" id="regenerate-char-music-btn" title="重新生成歌单">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+            </span>
+        </div>
+    </div>
+    <div id="char-music-list" class="list-container">
+        <!-- 歌曲列表将由JS动态生成在这里 -->
+    </div>
+</div>
+
+<!-- ▼▼▼ 请用这整块【全新 V3.0 | 仿黑胶唱片机UI】的代码，替换旧的 char-music-player-modal ▼▼▼ -->
+<div id="char-music-player-modal" class="modal">
+    <div class="modal-content">
+        <!-- 主内容区 -->
+        <div class="char-player-body">
+            <!-- 歌曲信息 -->
+            <div class="char-player-song-info">
+                <p id="char-music-player-title">歌曲名称</p>
+                <p id="char-music-artist">歌手</p>
+            </div>
+
+            <!-- 专辑封面 (黑胶唱片效果) -->
+            <div id="char-vinyl-container">
+                <img id="char-music-cover" src="">
+            </div>
+            
+            <!-- 【核心修改】将音符占位符替换为真正的歌词容器 -->
+            <div id="char-music-lyrics">
+                <!-- 歌词将由JS动态生成在这里 -->
+            </div>
+
+            <!-- 底部控制栏 -->
+            <div class="char-player-footer">
+                <div class="char-player-progress-bar-container">
+                    <span id="char-music-current-time" class="time-display">0:00</span>
+                    <div id="char-music-progress-bar" class="char-player-progress-bar">
+                        <div id="char-music-progress-fill"></div>
+                    </div>
+                    <span id="char-music-total-time" class="time-display">0:00</span>
+                </div>
+
+                <div class="char-player-controls">
+                    <button id="char-music-prev-btn" class="control-btn">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"></path></svg>
+                    </button>
+                    <button id="char-music-play-pause-btn" class="control-btn play">
+                        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+                    </button>
+                    <button id="char-music-next-btn" class="control-btn">
+                         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16 6h2v12h-2zm-3.5 6l-8.5 6V6z"></path></svg>
+                    </button>
+                     <button id="char-music-mode-btn" class="control-btn mode">顺序</button>
+                </div>
+            </div>
+        </div>
+        <!-- 关闭按钮被移到右上角 -->
+        <button id="close-char-music-player-btn" class="char-player-close-btn">×</button>
+    </div>
+</div>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
+</div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 
         <!-- ▼▼▼ 【请用这个新版本】完整替换旧的 world-book-screen ▼▼▼ -->
@@ -23317,32 +24684,30 @@ function updateMusicProgressBar() {
         }
         // ▲▲▲ 全新JS函数粘贴结束 ▲▲▲
         /**
-         * 【增强版】一个简单的 Markdown 解析器
+         * 【V2.1 | 最终修复版】一个简单的 Markdown 解析器
          * @param {string} text - 包含 Markdown 语法的原始文本
          * @returns {string} - 转换成 HTML 后的文本
          */
         function parseMarkdown(text) {
-            if (!text) return '';
-        
-            // 顺序很重要，先处理最具体的（两个字符的）
-            // 转换 **粗体** 为 <strong>粗体</strong>
-            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            if (!text || typeof text !== 'string') return '';
+
+            // 顺序很重要：先处理我们自定义的复杂规则
+            text = text.replace(/!h\{(.*?)\}/g, '<span class="diary-highlight">$1</span>');
+            text = text.replace(/!u\{(.*?)\}/g, '<span class="diary-underline">$1</span>');
+            text = text.replace(/!e\{(.*?)\}/g, '<span class="diary-emphasis">$1</span>');
+            text = text.replace(/!w\{(.*?)\}/g, '<span class="diary-handwritten">$1</span>');
+            text = text.replace(/!m\{(.*?)\}/g, '<span class="diary-messy">$1</span>');
             
-            // 转换 ~~删除线~~ 为 <s>删除线</s>
-            text = text.replace(/\~\~(.*?)\~\~/g, '<s>$1</s>');
-            
-            // ▼▼▼ 新增规则 ▼▼▼
-            // 转换 ==高亮== 为 <mark>高亮</mark>
-            text = text.replace(/==(.*?)==/g, '<mark>$1</mark>');
-        
-            // 转换 ||涂黑|| 为 <span class="spoiler">涂黑</span>
+            // ▼▼▼ 核心修改就在这里 ▼▼▼
+            // 将原来的 !c{...} 规则，替换为您想要的 ||...|| 规则
             text = text.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler">$1</span>');
-            // ▲▲▲ 新增结束 ▲▲▲
-        
-            // 最后处理单个字符的，避免与两个字符的冲突
-            // 转换 *斜体* 为 <em>斜体</em>
+            // ▲▲▲ 修改结束 ▲▲▲
+
+            // 再处理标准Markdown
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\~\~(.*?)\~\~/g, '<s>$1</s>'); 
             text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
+
             return text;
         }
         // ▼▼▼ 【全新 | 数据修复函数】请将这个函数粘贴到您的JS功能区 ▼▼▼
@@ -26634,12 +27999,2340 @@ async function importSingleChat(file) {
         await showCustomAlert('导入失败', `文件解析或应用失败: ${error.message}`);
     }
 }
+// ▼▼▼ 【全新】角色手机功能的所有核心JS代码 ▼▼▼
 
+/**
+ * 【总入口】打开角色选择界面
+ */
+function openCharacterSelector() {
+    renderCharacterSelector();
+    showScreen('character-selection-screen');
+}
+
+/**
+ * 渲染角色选择列表
+ */
+function renderCharacterSelector() {
+    const gridEl = document.getElementById('character-grid');
+    gridEl.innerHTML = '';
+    
+    // 只筛选出单聊角色
+    const characters = Object.values(state.chats).filter(chat => !chat.isGroup);
+
+    if (characters.length === 0) {
+        gridEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">还没有可以查看手机的角色哦~</p>';
+        return;
+    }
+
+    characters.forEach(char => {
+        const item = document.createElement('div');
+        item.className = 'character-select-item';
+        item.innerHTML = `
+            <img src="${char.settings.aiAvatar || defaultAvatar}" class="avatar">
+            <span class="name">${char.name}</span>
+        `;
+        item.addEventListener('click', () => switchToCharacterPhone(char.id));
+        gridEl.appendChild(item);
+    });
+}
+
+/**
+ * 切换到指定角色的手机界面
+ * @param {string} characterId - 角色的ID
+ */
+async function switchToCharacterPhone(characterId) {
+    activeCharacterId = characterId;
+    console.log(`已切换到角色 ${characterId} 的手机`);
+    
+    // 应用该角色的壁纸
+    const char = state.chats[characterId];
+    const charPhoneScreen = document.getElementById('character-phone-screen');
+    const wallpaper = char.settings.background || state.globalSettings.wallpaper;
+    if (wallpaper && wallpaper.startsWith('data:image')) {
+        charPhoneScreen.style.backgroundImage = `url(${wallpaper})`;
+    } else if (wallpaper) {
+        charPhoneScreen.style.backgroundImage = wallpaper;
+    }
+    
+    // 渲染并显示角色手机的主屏幕
+    renderCharHomeScreen();
+    showScreen('character-phone-screen');
+}
+
+/**
+ * 返回到用户自己的手机主屏幕
+ */
+function switchToMyPhone() {
+    activeCharacterId = null;
+    console.log("已返回我的手机");
+    showScreen('home-screen');
+}
+
+/**
+ * 渲染角色手机的主屏幕（主要是更新时钟）
+ */
+function renderCharHomeScreen() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    const dateString = now.toLocaleDateString('zh-CN', { weekday: 'long', month: 'long', day: 'numeric' });
+    document.getElementById('char-main-time').textContent = timeString;
+    document.getElementById('char-main-date').textContent = dateString;
+    switchToCharScreen('char-home-screen');
+}
+
+/**
+ * 在角色手机内部切换不同的App屏幕
+ * @param {string} screenId - 要显示的角色App屏幕ID
+ */
+function switchToCharScreen(screenId) {
+    document.querySelectorAll('.char-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+}
+// ▼▼▼ 【核心修复】将此函数暴露到全局，让onclick可以调用 ▼▼▼
+window.switchToCharScreen = switchToCharScreen;
+// ▲▲▲ 修复结束 ▲▲▲
+
+// ▼▼▼ 【V3.0 | 最终版】请用这个全新的函数，完整替换旧的 openCharApp ▼▼▼
+         /**
+         * 【总分发 | V3.0 | 最终修复版 | 已添加音乐App】打开角色手机内的App
+         * @param {string} appName - App的简称 (qq, album, amap...)
+         */
+        async function openCharApp(appName) {
+            if (!activeCharacterId) return;
+            const char = state.chats[activeCharacterId];
+            
+            await logAppUsage(activeCharacterId, appName);
+
+            switch(appName) {
+                case 'qq':
+                    renderCharSimulatedQQ();
+                    switchToCharScreen('char-qq-screen');
+                    break;
+                case 'album':
+                    renderCharAlbum();
+                    switchToCharScreen('char-album-screen');
+                    break;
+                case 'browser':
+                    renderCharBrowserHistory();
+                    switchToCharScreen('char-browser-screen');
+                    break;
+                case 'taobao':
+                    renderCharTaobao();
+                    switchToCharScreen('char-taobao-screen');
+                    break;
+                case 'memo':
+                    renderCharMemoList();
+                    switchToCharScreen('char-memo-screen');
+                    break;
+                case 'diary':
+                    renderCharDiaryList();
+                    switchToCharScreen('char-diary-screen');
+                    break;
+                case 'amap':
+                    renderCharAmap();
+                    switchToCharScreen('char-amap-screen');
+                    break;
+                
+                // ▼▼▼ 【核心修复就在这里！】 ▼▼▼
+                // 我们现在添加了对 'music' 的处理逻辑
+                case 'music':
+                    renderCharMusicScreen(); // 渲染网易云音乐列表
+                    switchToCharScreen('char-music-screen'); // 显示网易云音乐屏幕
+                    break;
+                // ▲▲▲ 修复结束 ▲▲▲
+
+                case 'usage':
+                    renderCharAppUsage();
+                    switchToCharScreen('char-usage-screen');
+                    break;
+            }
+        }
+        /**
+         * 【全新 | V3.0 终极防空窗版】渲染角色相册
+         */
+        async function renderCharAlbum() {
+            const gridEl = document.getElementById('char-album-grid');
+            gridEl.innerHTML = '';
+            if (!activeCharacterId) return;
+            const char = state.chats[activeCharacterId];
+        
+            const photos = char.simulatedAlbum || [];
+        
+            if (photos.length === 0) {
+                gridEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">TA的相册还是空的，<br>点击右上角刷新按钮生成一些照片吧！</p>';
+                return;
+            }
+        
+            // 这是我们安全可靠的“备用图片”
+            const fallbackImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent('a beautiful scenery, anime style, cinematic lighting')}`;
+
+            photos.forEach(photo => {
+                const item = document.createElement('div');
+                item.className = 'char-photo-item';
+                item.dataset.description = photo.description;
+                // 先显示一个灰色占位背景
+                item.style.backgroundColor = '#e9ecef';
+                gridEl.appendChild(item);
+
+                // ▼▼▼ 核心修复就在这里！这是最终的、最强的防御逻辑 ▼▼▼
+                
+                let finalPrompt;
+                
+                // 1. 我们首先检查 photo.image_prompt 这个字段是否存在，并且是一个非空的字符串
+                if (photo.image_prompt && typeof photo.image_prompt === 'string' && photo.image_prompt.trim()) {
+                    // 2. 如果存在，我们再检查它是否包含任何非英文字符
+                    const containsNonEnglish = /[^\x00-\x7F]/.test(photo.image_prompt);
+                    
+                    // 3. 只有当它不包含非英文字符时，我们才认为它是有效的
+                    if (!containsNonEnglish) {
+                        finalPrompt = photo.image_prompt;
+                    } else {
+                        // 如果包含中文，就记录一个警告，并准备使用备用指令
+                        console.warn('检测到无效的中文指令，已强制使用备用图片:', photo.image_prompt);
+                        finalPrompt = 'a beautiful scenery, anime style, cinematic lighting';
+                    }
+                } else {
+                    // 4. 如果 image_prompt 字段根本不存在，或者为空，我们直接使用备用指令
+                    console.warn('检测到缺失的 image_prompt，已强制使用备用图片。');
+                    finalPrompt = 'a beautiful scenery, anime style, cinematic lighting';
+                }
+                
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}`;
+
+                // --- 5. 图片加载检查器 (保持不变，作为第二层保险) ---
+                const img = new Image();
+                
+                img.onload = function() {
+                    item.style.backgroundImage = `url(${this.src})`;
+                };
+
+                img.onerror = function() {
+                    console.error('图片生成最终失败，已使用备用图片。失败的URL:', imageUrl);
+                    item.style.backgroundImage = `url(${fallbackImageUrl})`;
+                };
+                
+                img.src = imageUrl;
+                // --- 检查器工作结束 ---
+                // ▲▲▲ 修复结束 ▲▲▲
+            });
+        }
+
+/**
+ * 【全新】动态生成并渲染角色的浏览器历史记录
+ */
+function renderCharBrowserHistory() {
+    const listEl = document.getElementById('char-browser-history');
+    listEl.innerHTML = '';
+    if (!activeCharacterId) return;
+
+    const char = state.chats[activeCharacterId];
+    // 这里我们基于角色的名字和人设，动态生成一些看起来合理的历史记录
+    const historyKeywords = [char.name, "爱好", "旅游", "美食", "新闻", ...char.settings.aiPersona.split(/，|。|\s/).slice(0, 5)];
+    const historySites = ["知乎", "Bilibili", "小红书", "微博", "维基百科"];
+
+    for (let i = 0; i < 15; i++) {
+        const keyword = historyKeywords[Math.floor(Math.random() * historyKeywords.length)];
+        const site = historySites[Math.floor(Math.random() * historySites.length)];
+        const item = document.createElement('div');
+        item.className = 'char-browser-item';
+        item.innerHTML = `
+            <div class="title">${keyword} - ${site}</div>
+            <div class="url">www.${site.toLowerCase()}.com/${keyword}</div>
+        `;
+        listEl.appendChild(item);
+    }
+}
+
+        /**
+         * 【全新 | V3.0 无钱包版 | 最终修复】渲染角色的淘宝“购买记录”页面
+         */
+        function renderCharTaobao() {
+            const gridEl = document.getElementById('char-product-grid');
+            gridEl.innerHTML = '';
+            if (!activeCharacterId) return;
+
+            const char = state.chats[activeCharacterId];
+            
+            // ▼▼▼ 核心修复就在这里！▼▼▼
+            // 我们现在告诉代码，要去 simulatedTaobaoHistory 这个“包裹”里，
+            // 拿出名叫 purchases 的“购物清单”（数组）。
+            const purchases = char.simulatedTaobaoHistory?.purchases || [];
+            // ▲▲▲ 修复结束 ▲▲▲
+
+            if (purchases.length === 0) {
+                gridEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">TA最近好像什么都没买呢，<br>点击右上角刷新按钮生成一些记录吧！</p>';
+                return;
+            }
+
+            purchases.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'char-product-item';
+                itemEl.dataset.reason = item.reason;
+                
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(item.image_prompt || 'a random product')}`;
+
+                itemEl.innerHTML = `
+                    <img src="${imageUrl}" class="product-image">
+                    <div class="product-info">
+                        <div class="product-name">${item.itemName}</div>
+                        <div class="product-price">${(item.price || 0).toFixed(2)}</div>
+                    </div>
+                `;
+                gridEl.appendChild(itemEl);
+            });
+        }
+/**
+ * 切换回角色手机的主屏幕
+ */
+function switchToCharHomeScreen() {
+    switchToCharScreen('char-home-screen');
+}
+
+
+// --- 角色手机App的具体功能 ---
+
+/**
+ * 渲染角色视角的QQ聊天列表 (简化版)
+ */
+function renderCharChatList() {
+    const listEl = document.getElementById('char-chat-list');
+    listEl.innerHTML = '';
+    if (!activeCharacterId) return;
+
+    // 找出所有与该角色相关的聊天
+    const relatedChats = Object.values(state.chats).filter(chat => {
+        // 条件1: 与用户的单聊
+        if (chat.id === activeCharacterId) return true;
+        // 条件2: 角色所在的群聊
+        if (chat.isGroup && chat.members.some(m => m.id === activeCharacterId)) return true;
+        return false;
+    });
+
+    relatedChats.forEach(chat => {
+        const item = createChatListItem(chat); // 复用主列表的渲染函数
+        listEl.appendChild(item);
+    });
+}
+
+/**
+ * 记录App使用日志
+ */
+async function logAppUsage(characterId, appName) {
+    const char = state.chats[characterId];
+    if (!char) return;
+    if (!char.appUsageLog) {
+        char.appUsageLog = [];
+    }
+    char.appUsageLog.push({
+        appName: appName,
+        timestamp: Date.now()
+    });
+    // 保留最近50条记录
+    if (char.appUsageLog.length > 50) {
+        char.appUsageLog.shift();
+    }
+    await db.chats.put(char);
+}
+
+/**
+ * 渲染App使用记录
+ */
+function renderCharAppUsage() {
+    const listEl = document.getElementById('char-usage-list');
+    listEl.innerHTML = '';
+    const char = state.chats[activeCharacterId];
+    const log = (char.appUsageLog || []).slice().reverse(); // 从新到旧显示
+
+    if (log.length === 0) {
+        listEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">还没有任何使用记录。</p>';
+        return;
+    }
+
+    const appNameMap = {
+        'qq': 'QQ', 'album': '相册', 'browser': '浏览器', 'taobao': '淘宝',
+        'memo': '备忘录', 'diary': '日记', 'amap': '高德地图', 'usage': 'App记录'
+    };
+
+    log.forEach(entry => {
+        const item = document.createElement('div');
+        item.className = 'usage-item';
+        item.innerHTML = `
+            <div class="timestamp">${new Date(entry.timestamp).toLocaleString()}</div>
+            <div class="action">打开了 <strong>${appNameMap[entry.appName] || entry.appName}</strong></div>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+/**
+ * 模拟角色发送位置分享
+ */
+async function sendCharLocationShare(locationName) {
+    const userChat = state.chats[activeCharacterId]; // 获取与该角色的单聊
+    if (!userChat) return;
+
+    const msg = {
+        role: 'assistant', // 是AI（角色）发出的
+        senderName: userChat.originalName,
+        type: 'location_share',
+        content: locationName,
+        imageUrl: 'https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1756262526935_qdqqd_4uque3.jpeg',
+        timestamp: Date.now()
+    };
+
+    userChat.history.push(msg);
+    await db.chats.put(userChat);
+    
+    // 如果当前正与该角色聊天，则实时显示
+    if (state.activeChatId === activeCharacterId) {
+        appendMessage(msg, userChat);
+    }
+    
+    await showCustomAlert("分享成功", `“${userChat.name}” 的位置已发送到你们的聊天中。`);
+}
+
+
+/**
+ * 【V2.1 | 全屏查看最终版】点击备忘录列表项时，打开详情页面查看其内容
+ * @param {number} memoId - 要查看的备忘录的ID
+ */
+async function viewMemo(memoId) {
+    const char = state.chats[activeCharacterId];
+    if (!char || !char.memos) return;
+
+    const memo = char.memos.find(m => m.id === memoId);
+    if (memo) {
+        // 1. 【核心修复】现在我们直接通过ID查找标题和内容元素
+        const titleEl = document.getElementById('char-memo-detail-title');
+        const contentEl = document.getElementById('char-memo-detail-content');
+
+        // 2. 将备忘录的数据填充进去
+        if (titleEl) titleEl.textContent = memo.title;
+        if (contentEl) contentEl.value = memo.content;
+
+        // 3. 切换到新的详情页屏幕
+        switchToCharScreen('char-memo-detail-screen');
+    }
+}
+
+/**
+ * 【V2.0 | 支持标题】渲染角色手机的备忘录列表
+ */
+function renderCharMemoList() {
+    const listEl = document.getElementById('char-memo-list');
+    listEl.innerHTML = '';
+    const char = state.chats[activeCharacterId];
+    const memos = (char.memos || []).slice().reverse();
+
+    if (memos.length === 0) {
+        listEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">还没有备忘录。</p>';
+        return;
+    }
+
+    memos.forEach(memo => {
+        const item = document.createElement('div');
+        // 复用现有的 list-item 样式，美观且统一
+        item.className = 'list-item'; 
+        item.innerHTML = `
+            <div class="item-title">${memo.title}</div>
+            <div class="item-content">${(memo.content || '').split('\n')[0]}</div>
+        `;
+        // 【核心修改】点击列表项现在是调用 viewMemo 查看函数
+        item.addEventListener('click', () => viewMemo(memo.id));
+        addLongPressListener(item, () => deleteMemo(memo.id));
+        listEl.appendChild(item);
+    });
+}
+
+/**
+ * 【V2.1 | 流程修正】打开编辑器以创建新的备忘录
+ */
+async function openMemoEditor(memoId = null) {
+    editingMemoId = null; 
+    
+    // （这部分逻辑与之前相同）
+    const newTitle = await showCustomPrompt("新建备忘录", "请输入标题");
+    if (newTitle === null || !newTitle.trim()) return;
+
+    const newContent = await showCustomPrompt(`标题: ${newTitle}`, "请输入备忘录内容", "", 'textarea');
+    if (newContent !== null) {
+        // 【核心修正】在保存后，确保我们停留在备忘录列表页
+        await saveMemo({ title: newTitle.trim(), content: newContent });
+        switchToCharScreen('char-memo-screen'); // 确保显示的是列表
+    }
+}
+
+/**
+ * 【V2.0 | 支持标题】保存新的备忘录
+ * @param {object} memoData - 包含 title 和 content 的对象
+ */
+async function saveMemo(memoData) {
+    const char = state.chats[activeCharacterId];
+    if (!char.memos) char.memos = [];
+    
+    // 这个函数现在只处理“新建”
+    char.memos.push({ 
+        id: Date.now(), 
+        title: memoData.title, 
+        content: memoData.content 
+    });
+    
+    await db.chats.put(char);
+    renderCharMemoList();
+}
+
+async function saveMemo(content) {
+    const char = state.chats[activeCharacterId];
+    if (!char.memos) char.memos = [];
+    
+    if (editingMemoId) {
+        const memo = char.memos.find(m => m.id === editingMemoId);
+        if (memo) memo.content = content;
+    } else {
+        char.memos.push({ id: Date.now(), content: content });
+    }
+    
+    await db.chats.put(char);
+    renderCharMemoList();
+    editingMemoId = null;
+}
+
+
+
+// ▼▼▼ 【V2.0 | AI生成版】请用这一整块代码，替换所有旧的日记功能函数 ▼▼▼
+
+        /**
+         * 【V3.0 | AI指令强化版】当用户点击“重新生成”时，调用AI生成模拟相册内容
+         */
+        async function handleGenerateSimulatedDiaries() {
+            if (!activeCharacterId) return;
+            const chat = state.chats[activeCharacterId];
+            if (!chat) return;
+        
+            await showCustomAlert("请稍候...", `正在请求“${chat.name}”翻开TA的日记本...`);
+        
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            if (!proxyUrl || !apiKey || !model) {
+                alert('请先在API设置中配置好API信息。');
+                return;
+            }
+        
+            // 【修复】定义一个更安全的用户显示名，避免传递"{{user}}"
+            const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+
+            const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
+            const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
+            const worldBookContext = (chat.settings.linkedWorldBookIds || [])
+                .map(bookId => state.worldBooks.find(wb => wb.id === bookId))
+                .filter(Boolean)
+                .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e=>e.enabled).map(e => `- ${e.content}`).join('\n')}`)
+                .join('');
+        
+            const systemPrompt = `
+# 你的任务
+你是一个虚拟生活模拟器和故事作家。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出【3到5篇】TA最近可能会写的日记。
+
+# 核心规则
+1.  **【【【沉浸感铁律】】】**: 每一篇日记都必须使用【第一人称视角 ("我")】来写，并且要充满角色的个人情感、思考和秘密。在日记中描述自己的行为或想法时，【绝对禁止】使用第三人称“他”或“她” (TA)。
+2.  **【【【长度铁律】】】**: 每一篇日记的正文长度【必须不少于300字】。
+3.  **【【【格式铁律 (最高优先级)】】】**: 你的回复【必须且只能】是一个JSON数组。数组中的每个元素都是一个对象，代表一篇日记，格式【必须】如下:
+    \`\`\`json
+    [
+      {
+        "title": "这篇日记的标题，例如：9月20日 晴",
+        "content": "这里是日记的详细正文，必须支持换行符\\n，并且必须巧妙地使用下面的【日记专属Markdown语法】来丰富文本表现力。"
+      }
+    ]
+    \`\`\`
+4.  **【【【日记专属Markdown语法 (必须使用！)】】】**:
+    -   \`**加粗文字**\`: 用于强调。
+    -   \`~~划掉的文字~~\`: 用于表示改变主意或自我否定。
+    -   \`!h{黄色高亮}\`: 用于标记关键词或重要信息。
+    -   \`!u{粉色下划线}\`: 用于标注人名、地名或特殊名词。
+    -   \`!e{粉色强调}\`: 用于表达强烈的情绪。
+    -   \`!w{手写体}\`: 用于写下引言、歌词或特殊笔记。
+    -   \`!m{凌乱的手写体}\`: 用于表达激动、慌乱或潦草记录时的心情。
+    -   \`||涂黑||\`: 用于隐藏秘密或敏感词汇。
+
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+- **你的长期记忆**:
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请开始撰写这组充满真情实感、并熟练运用了Markdown语法的日记。`;
+        
+            try {
+                const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成你的日记内容。" }];
+                let isGemini = proxyUrl.includes('generativelanguage');
+                let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+                
+                const response = isGemini 
+                    ? await fetch(geminiConfig.url, geminiConfig.data) 
+                    : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                            temperature: 0.95,
+                        })
+                    });
+        
+                if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
+                
+                const data = await response.json();
+                const aiResponseContent = getGeminiResponseText(data);
+                const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+                const simulatedDiaries = JSON.parse(cleanedJson);
+                
+                chat.diary = simulatedDiaries.map(entry => ({
+                    id: Date.now() + Math.random(),
+                    title: entry.title,
+                    content: entry.content,
+                    timestamp: Date.now()
+                }));
+                
+                await db.chats.put(chat);
+                await renderCharDiaryList();
+                
+            } catch (error) {
+                console.error("生成模拟日记失败:", error);
+                await showCustomAlert("生成失败", `无法生成日记，请检查API配置或稍后再试。\n错误: ${error.message}`);
+            }
+        }
+
+        /**
+         * 【全新】当用户点击“+”时，触发AI撰写一篇新日记并追加到末尾
+         */
+        async function handleWriteNewDiaryEntry() {
+            if (!activeCharacterId) return;
+            const chat = state.chats[activeCharacterId];
+            if (!chat) return;
+        
+            await showCustomAlert("请稍候...", `正在请求“${chat.name}”写一篇新日记...`);
+        
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            if (!proxyUrl || !apiKey || !model) return;
+
+            // 【修复】定义一个更安全的用户显示名
+            const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+
+            const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
+            const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
+            const worldBookContext = (chat.settings.linkedWorldBookIds || []).map(bookId=>state.worldBooks.find(wb=>wb.id===bookId)).filter(Boolean).map(book=>`\n## 世界书《${book.name}》设定:\n${book.content.filter(e=>e.enabled).map(e=>`- ${e.content}`).join('\n')}`).join('');
+            
+            const systemPrompt = `
+# 你的任务
+你是一个虚拟生活模拟器和故事作家。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出【1篇】TA今天可能会写的日记。
+
+# 核心规则
+1.  **【【【沉浸感铁律】】】**: 日记必须使用【第一人称视角 ("我")】来写，并且要充满角色的个人情感、思考和秘密。在日记中描述自己的行为或想法时，【绝对禁止】使用第三人称“他”或“她” (TA)。
+2.  **【【【长度铁律】】】**: 日记的正文长度【必须不少于300字】。
+3.  **【【【格式铁律 (最高优先级)】】】**: 你的回复【必须且只能】是一个JSON数组，且数组中【只包含一个】对象，格式【必须】如下:
+    \`\`\`json
+    [
+      {
+        "title": "这篇日记的标题，例如：9月20日 晴",
+        "content": "这里是日记的详细正文，必须支持换行符\\n，并且必须巧妙地使用下面的【日记专属Markdown语法】来丰富文本表现力。"
+      }
+    ]
+    \`\`\`
+4.  **【【【日记专属Markdown语法 (必须使用！)】】】**:
+    -   \`**加粗文字**\`: 用于强调。
+    -   \`~~划掉的文字~~\`: 用于表示改变主意或自我否定。
+    -   \`!h{黄色高亮}\`: 用于标记关键词或重要信息。
+    -   \`!u{粉色下划线}\`: 用于标注人名、地名或特殊名词。
+    -   \`!e{粉色强调}\`: 用于表达强烈的情绪。
+    -   \`!w{手写体}\`: 用于写下引言、歌词或特殊笔记。
+    -   \`!m{凌乱的手写体}\`: 用于表达激动、慌乱或潦草记录时的心情。
+    -   \`||涂黑||\`: 用于隐藏秘密或敏感词汇 (每次至少涂黑2-5个字)。
+
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+- **你的长期记忆**:
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请开始撰写这篇充满真情实感、并熟练运用了Markdown语法的日记。`;
+        
+            try {
+                const messagesForApi = [{ role: 'user', content: "请根据你的设定，写一篇新日记。" }];
+                let isGemini = proxyUrl.includes('generativelanguage');
+                let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+                const response = isGemini ? await fetch(geminiConfig.url, geminiConfig.data) : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                        temperature: 0.95,
+                    })
+                });
+                if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
+                const data = await response.json();
+                const aiResponseContent = getGeminiResponseText(data);
+                const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+                const newDiaryEntry = JSON.parse(cleanedJson)[0];
+                
+                if (!chat.diary) chat.diary = [];
+                
+                chat.diary.push({
+                    id: Date.now(),
+                    title: newDiaryEntry.title,
+                    content: newDiaryEntry.content,
+                    timestamp: Date.now()
+                });
+                
+                await db.chats.put(chat);
+                await renderCharDiaryList();
+        
+            } catch (error) {
+                console.error("生成新日记失败:", error);
+                await showCustomAlert("生成失败", `错误: ${error.message}`);
+            }
+        }
+
+/**
+ * 【全新 | V2.0】渲染角色手机的日记列表
+ */
+function renderCharDiaryList() {
+    const listEl = document.getElementById('char-diary-list');
+    listEl.innerHTML = '';
+    const char = state.chats[activeCharacterId];
+    const diaries = (char.diary || []).slice().reverse();
+
+    if (diaries.length === 0) {
+        listEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">日记本还是空的。</p>';
+        return;
+    }
+
+    diaries.forEach(entry => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+            <div class="item-title">${entry.title}</div>
+            <div class="item-content">${new Date(entry.timestamp).toLocaleDateString()}</div>
+        `;
+        item.addEventListener('click', () => viewDiary(entry.id));
+        addLongPressListener(item, () => deleteDiary(entry.id));
+        listEl.appendChild(item);
+    });
+}
+
+/**
+ * 【全新】点击日记列表项时，打开详情页面查看
+ * @param {number} diaryId - 要查看的日记的ID
+ */
+async function viewDiary(diaryId) {
+    const char = state.chats[activeCharacterId];
+    if (!char || !char.diary) return;
+
+    const entry = char.diary.find(d => d.id === diaryId);
+    if (entry) {
+        const titleEl = document.getElementById('char-diary-detail-title');
+        const contentEl = document.getElementById('char-diary-detail-content');
+
+        titleEl.textContent = entry.title;
+        const formattedContent = parseMarkdown(entry.content)
+            .split('\n')
+            .map(p => `<p>${p || '&nbsp;'}</p>`)
+            .join('');
+            
+        contentEl.innerHTML = formattedContent;
+
+        switchToCharScreen('char-diary-detail-screen');
+    }
+}
+
+/**
+ * 【全新】删除一篇日记
+ * @param {number} diaryId - 要删除的日记的ID
+ */
+async function deleteDiary(diaryId) {
+    const confirmed = await showCustomConfirm('删除日记', '确定要删除这篇日记吗？', { confirmButtonClass: 'btn-danger' });
+    if (confirmed) {
+        const char = state.chats[activeCharacterId];
+        char.diary = char.diary.filter(d => d.id !== diaryId);
+        await db.chats.put(char);
+        renderCharDiaryList();
+    }
+}
+
+// ▲▲▲ 替换结束 ▲▲▲
+
+/**
+ * 【全新 V2.0 | 支持群聊】渲染角色手机的QQ界面
+ */
+async function renderCharSimulatedQQ() {
+    const listEl = document.getElementById('char-chat-list');
+    listEl.innerHTML = '';
+    const char = state.chats[activeCharacterId];
+    
+    if (!char.simulatedConversations || char.simulatedConversations.length === 0) {
+        listEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">点击右上角刷新按钮，<br>看看TA最近都和谁聊天了吧！</p>';
+        return;
+    }
+
+    char.simulatedConversations.forEach((convo, index) => {
+        const item = document.createElement('div');
+        item.className = 'chat-list-item';
+        item.dataset.conversationIndex = index;
+
+        const lastMessage = convo.messages.slice(-1)[0] || { content: '...' };
+
+        let avatarUrl, displayName;
+
+        // ▼▼▼ 核心修改就在这里！ ▼▼▼
+        if (convo.type === 'group') {
+            displayName = convo.groupName;
+            
+            // 1. 我们不再只用群名，而是构造一个更丰富的英文指令
+            //    - "logo": 告诉AI我们想要一个图标
+            //    - "simple, flat design": 要求设计简洁、扁平化，更像App图标
+            //    - convo.groupName: 将群名作为核心主题
+            const groupAvatarPrompt = `logo, simple, flat design, for a group chat named '${convo.groupName}'`;
+            
+            // 2. 将这个更具体的指令发送给AI绘画引擎
+            avatarUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(groupAvatarPrompt)}`;
+            
+            // (这段添加“群”标签的逻辑保持不变)
+            displayName += ` <span class="group-tag">群</span>`;
+
+        } else { // 私聊的逻辑保持不变
+            displayName = convo.participant.name;
+            const npcAvatarPrompt = convo.participant.avatar_prompt || 'anime person';
+            avatarUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(npcAvatarPrompt)}`;
+        }
+        // ▲▲▲ 修改结束 ▲▲▲
+
+        item.innerHTML = `
+            <div class="avatar-group">
+                 <img src="${avatarUrl}" class="avatar" style="border-radius: 50%;">
+            </div>
+            <div class="info">
+                <div class="name-line">
+                    <span class="name">${displayName}</span>
+                </div>
+                <div class="last-msg">${String(lastMessage.content).substring(0, 20)}...</div>
+            </div>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+// ▼▼▼ 【最终修复版】请用这整块代码，完整替换旧的 handleGenerateSimulatedQQ 函数 ▼▼▼
+        /**
+         * 【全新 | V2.2 AI绘图版】当用户点击“重新生成”时，调用AI生成模拟对话
+         */
+        async function handleGenerateSimulatedQQ() {
+            if (!activeCharacterId) return;
+            const chat = state.chats[activeCharacterId];
+        
+            if (!chat) {
+                console.error("无法生成模拟对话，因为找不到当前角色 (activeCharacterId: " + activeCharacterId + ")");
+                await showCustomAlert("操作失败", "无法找到当前角色的数据，请尝试返回并重新选择角色。");
+                return;
+            }
+        
+            await showCustomAlert("请稍候...", `正在根据“${chat.name}”的记忆和人设，生成最近的社交动态...`);
+        
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            if (!proxyUrl || !apiKey || !model) {
+                alert('请先在API设置中配置好API信息。');
+                return;
+            }
+            
+            // 【修复】定义一个更安全的用户显示名，避免传递"{{user}}"
+            const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+        
+            let worldBookContext = '';
+            if (chat.settings.linkedWorldBookIds && chat.settings.linkedWorldBookIds.length > 0) {
+                const linkedContents = chat.settings.linkedWorldBookIds
+                    .map(bookId => state.worldBooks.find(wb => wb.id === bookId))
+                    .filter(Boolean)
+                    // ▼▼▼ 【【【核心修复就在这里！】】】 ▼▼▼
+                    // 之前的错误是 `world.name`，正确的应该是 `book.name`
+                    .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e => e.enabled).map(e => `- ${e.content}`).join('\n')}`)
+                    // ▲▲▲ 修复结束 ▲▲▲
+                    .join('');
+                if (linkedContents) {
+                    worldBookContext = `\n\n# 世界观设定 (必须严格遵守)\n${linkedContents}`;
+                }
+            }
+        
+            const longTermMemoryContext = chat.longTermMemory && chat.longTermMemory.length > 0
+                ? `# 你的长期记忆 (已发生的事实)\n${chat.longTermMemory.map(mem => `- ${mem.content}`).join('\n')}`
+                : '';
+            
+            const recentHistoryWithUser = chat.history.slice(-10).map(msg => {
+                const sender = msg.role === 'user' ? userDisplayNameForAI : chat.name;
+                return `${sender}: ${String(msg.content).substring(0, 50)}...`;
+            }).join('\n');
+        
+            const characterOriginalName = chat.originalName || chat.name;
+        
+            const systemPrompt = `
+# 你的任务
+你是一个虚拟社交生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出【5到7段】TA最近可能发生的QQ聊天记录。这些记录可以包括【私聊】和【群聊】。
+
+# 核心规则
+1.  **【【【世界书优先】】】**: 如果下面的“世界观设定”中提到了任何具体的【群聊名称】或【群成员】，你【必须】为这个群聊生成一段对话。
+2.  **创造性与多样性**: 自由创造符合角色背景的NPC和群聊，对话内容要多样化，反映角色的生活。
+3.  **关联性**: 对话内容应巧妙地反映角色的长期记忆、世界观，以及与用户互动可能带来的心情变化。
+4.  **简洁性**: 每段对话的总长度应在4到8句之间。
+5.  **【【【格式铁律 (最高优先级)】】】**: 你的回复【必须且只能】是一个JSON数组。数组中的每个元素都代表一段对话，且【必须】是以下两种格式之一：
+
+    **格式 A：私聊**
+    \`\`\`json
+    {
+      "type": "private",
+      "participant": {
+        "name": "NPC的名字",
+        "avatar_prompt": "一段用于生成头像的【英文】关键词, 风格为动漫/插画/二次元等, 禁止真人"
+      },
+      "messages": [
+        { "sender": "${characterOriginalName}", "content": "对话内容1" },
+        { "sender": "NPC的名字", "content": "对话内容2" }
+      ]
+    }
+    \`\`\`
+
+    **格式 B：群聊**
+    \`\`\`json
+    {
+      "type": "group",
+      "groupName": "世界书中提到的或你虚构的群名",
+      "participants": [
+        { "name": "NPC成员1", "avatar_prompt": "成员1的头像【英文】关键词" },
+        { "name": "NPC成员2", "avatar_prompt": "成员2的头像【英文】关键词" }
+      ],
+      "messages": [
+        { "sender": "${characterOriginalName}", "content": "我在群里说的话" },
+        { "sender": "NPC成员1", "content": "成员1回复我" },
+        { "sender": "NPC成员2", "content": "成员2加入了讨论" }
+      ]
+    }
+    \`\`\`
+    - **重要**: \`messages\` 数组中的 \`sender\` 字段，【必须】使用角色的【本名】("${characterOriginalName}") 或NPC的名字。
+
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请开始生成模拟聊天记录。`;
+        
+            try {
+                const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成模拟聊天记录。" }];
+                let isGemini = proxyUrl.includes('generativelanguage');
+                let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+                
+                const response = isGemini 
+                    ? await fetch(geminiConfig.url, geminiConfig.data) 
+                    : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                            temperature: 0.9,
+                            response_format: { "type": "json_object" } 
+                        })
+                    });
+        
+                if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
+                
+                const data = await response.json();
+                const aiResponseContent = getGeminiResponseText(data);
+                const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+                
+                const simulatedConversations = JSON.parse(cleanedJson);
+                chat.simulatedConversations = simulatedConversations;
+                await db.chats.put(chat);
+                
+                await renderCharSimulatedQQ();
+                
+            } catch (error) {
+                console.error("生成模拟聊天失败:", error);
+                await showCustomAlert("生成失败", `无法生成模拟聊天记录，请检查API配置或稍后再试。\n错误: ${error.message}`);
+            }
+        }
+// ▲▲▲ 替换结束 ▲▲▲
+
+/**
+ * 【全新 | V3.0 页面版 | 支持群聊】打开并显示指定的模拟聊天记录
+ * @param {number} conversationIndex - 在数组中的索引
+ */
+async function openCharSimulatedConversation(conversationIndex) {
+    const mainChar = state.chats[activeCharacterId];
+    const conversation = mainChar.simulatedConversations[conversationIndex];
+    if (!conversation) return;
+
+    const conversationScreen = document.getElementById('char-qq-conversation-screen');
+    const titleEl = document.getElementById('char-conversation-partner-name');
+    const bodyEl = document.getElementById('char-conversation-messages');
+    const inputEl = document.getElementById('char-simulated-input');
+
+    bodyEl.innerHTML = '';
+    bodyEl.dataset.theme = mainChar.settings.theme || 'default';
+    const isDarkMode = document.getElementById('phone-screen').classList.contains('dark-mode');
+    bodyEl.style.backgroundColor = isDarkMode ? '#000000' : '#f0f2f5';
+
+    const participantMap = new Map();
+
+    // ▼▼▼ 核心修改就在这里！▼▼▼
+    // 我们现在统一使用 participantMap 来处理所有头像，不再区分私聊和群聊
+
+    if (conversation.type === 'group') {
+        titleEl.textContent = `${conversation.groupName} (${conversation.participants.length + 1})`;
+        inputEl.placeholder = `在 ${conversation.groupName} 中聊天`;
+        
+        conversation.participants.forEach(p => {
+            participantMap.set(p.name, `https://image.pollinations.ai/prompt/${encodeURIComponent(p.avatar_prompt || 'anime person')}`);
+        });
+        
+    } else { // 私聊逻辑
+        titleEl.textContent = conversation.participant.name;
+        inputEl.placeholder = `与 ${conversation.participant.name} 的对话`;
+        
+        // 【关键修复】为私聊也添加头像到 participantMap 中
+        const npcAvatarUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(conversation.participant.avatar_prompt || 'anime person')}`;
+        participantMap.set(conversation.participant.name, npcAvatarUrl);
+    }
+    
+    // 无论私聊还是群聊，都把主角自己的信息也存入Map
+    participantMap.set(mainChar.originalName || mainChar.name, mainChar.settings.aiAvatar);
+    
+    const tempChatObjectForRendering = {
+        id: 'temp_simulated_chat',
+        isGroup: conversation.type === 'group',
+        name: conversation.groupName || conversation.participant.name,
+        originalName: mainChar.originalName,
+        members: conversation.participants ? conversation.participants.map(p => ({
+            originalName: p.name,
+            groupNickname: p.name,
+            avatar: participantMap.get(p.name) || defaultGroupMemberAvatar
+        })) : [],
+        settings: {
+            theme: mainChar.settings.theme,
+            fontSize: mainChar.settings.fontSize,
+            customCss: mainChar.settings.customCss,
+            myNickname: mainChar.name,
+            myAvatar: mainChar.settings.aiAvatar,
+            // 【关键修复】对于私聊，我们也从 map 中获取aiAvatar
+            aiAvatar: conversation.participant ? participantMap.get(conversation.participant.name) : '',
+            myAvatarFrame: mainChar.settings.aiAvatarFrame,
+            aiAvatarFrame: ''
+        }
+    };
+    // ▲▲▲ 修改结束 ▲▲▲
+    
+    for (const msg of conversation.messages) {
+        const isFromMainChar = msg.sender === (mainChar.originalName || mainChar.name);
+        
+        const tempMessageObject = {
+            role: isFromMainChar ? 'user' : 'assistant',
+            senderName: msg.sender,
+            content: msg.content,
+            timestamp: Date.now() + Math.random()
+        };
+
+        const bubbleElement = await createMessageElement(tempMessageObject, tempChatObjectForRendering);
+        
+        if (bubbleElement) {
+            bodyEl.appendChild(bubbleElement);
+        }
+    }
+
+    switchToCharScreen('char-qq-conversation-screen');
+    bodyEl.scrollTop = bodyEl.scrollHeight;
+}
+/**
+ * 【全新】关闭模拟聊天记录弹窗
+ */
+function closeSimulatedTranscriptModal() {
+    document.getElementById('char-qq-transcript-modal').classList.remove('visible');
+}
+
+// ▲▲▲ 全新JS代码粘贴结束 ▲▲▲
+        /**
+         * 【全新 | V3.0 AI指令强化版】当用户点击“重新生成”时，调用AI生成模拟相册内容
+         */
+        async function handleGenerateSimulatedAlbum() {
+            if (!activeCharacterId) return;
+            const chat = state.chats[activeCharacterId];
+        
+            if (!chat) {
+                await showCustomAlert("操作失败", "无法找到当前角色的数据。");
+                return;
+            }
+        
+            await showCustomAlert("请稍候...", `正在请求“${chat.name}”回忆TA的相册照片...`);
+        
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            if (!proxyUrl || !apiKey || !model) {
+                alert('请先在API设置中配置好API信息。');
+                return;
+            }
+        
+            // 【修复】定义一个更安全的用户显示名
+            const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+            
+            const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
+            const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
+            const worldBookContext = (chat.settings.linkedWorldBookIds || [])
+                .map(bookId => state.worldBooks.find(wb => wb.id === bookId))
+                .filter(Boolean)
+                .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e => e.enabled).map(e => `- ${e.content}`).join('\n')}`)
+                .join('');
+        
+            const systemPrompt = `
+# 你的任务
+你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，构思出【8到10张】TA最近可能会拍摄或珍藏在手机相册里的照片。
+
+# 核心规则
+1.  **创造性与合理性**: 照片内容必须完全符合角色的性格、爱好、职业和生活环境。
+2.  **多样性**: 照片主题要丰富，可以包括自拍、风景、食物、宠物、朋友合影、工作场景等。
+3.  **格式铁律 (最高优先级)**: 你的回复【必须且只能】是一个JSON数组。数组中的每个元素都是一个对象，代表一张照片，格式【必须】如下:
+    \`\`\`json
+    [
+      {
+        "description": "这是照片背后的故事或角色的心情日记，必须使用第一人称“我”来写。",
+        "image_prompt": "一段用于生成这张照片的、详细的【英文】关键词。"
+      }
+    ]
+    \`\`\`
+    - **【【【image_prompt 绝对禁止】】】**: 绝对禁止包含任何中文字符、句子、特殊符号、或任何可能涉及敏感（NSFW）、暴力、血腥、政治的内容！也禁止真人！
+    - **【【【image_prompt 必须是】】】**: 必须是纯英文的、用逗号分隔的【关键词组合】 (e.g., "1boy, solo, basketball jersey, in locker room, smiling, selfie")。
+    - **【【【画风指令】】】**: 在 prompt 的末尾，总是加上画风指令，例如： \`best quality, masterpiece, anime style, cinematic lighting\`
+
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请开始生成这组照片的描述和绘画指令。`;
+        
+            try {
+                const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成你的相册内容。" }];
+                let isGemini = proxyUrl.includes('generativelanguage');
+                let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+                
+                const response = isGemini 
+                    ? await fetch(geminiConfig.url, geminiConfig.data) 
+                    : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                            temperature: 0.9,
+                            response_format: { "type": "json_object" } 
+                        })
+                    });
+
+                if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
+                
+                const data = await response.json();
+                const aiResponseContent = getGeminiResponseText(data);
+                const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+                
+                const simulatedAlbumData = JSON.parse(cleanedJson);
+                
+                chat.simulatedAlbum = simulatedAlbumData;
+                await db.chats.put(chat);
+                
+                await renderCharAlbum();
+                
+            } catch (error) {
+                console.error("生成模拟相册失败:", error);
+                await showCustomAlert("生成失败", `无法生成模拟相册，请检查API配置或稍后再试。\n错误: ${error.message}`);
+            }
+        }
+
+        /**
+         * 【全新 | V3.0 终极防空窗版】渲染角色相册
+         */
+        async function renderCharAlbum() {
+            const gridEl = document.getElementById('char-album-grid');
+            gridEl.innerHTML = '';
+            if (!activeCharacterId) return;
+            const char = state.chats[activeCharacterId];
+        
+            const photos = char.simulatedAlbum || [];
+        
+            if (photos.length === 0) {
+                gridEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">TA的相册还是空的，<br>点击右上角刷新按钮生成一些照片吧！</p>';
+                return;
+            }
+        
+            // 这是我们安全可靠的“备用图片”
+            const fallbackImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent('a beautiful scenery, anime style, cinematic lighting')}`;
+
+            photos.forEach(photo => {
+                const item = document.createElement('div');
+                item.className = 'char-photo-item';
+                item.dataset.description = photo.description;
+                // 先显示一个灰色占位背景
+                item.style.backgroundColor = '#e9ecef';
+                gridEl.appendChild(item);
+
+                // ▼▼▼ 核心修复就在这里！▼▼▼
+                // 1. 使用正则表达式检查 prompt 是否包含任何非英文字符
+                const containsNonEnglish = /[^\x00-\x7F]/.test(photo.image_prompt);
+                
+                // 2. 我们的“有效性”检查现在变得更严格了：
+                //    - 必须存在
+                //    - 必须不是空字符串
+                //    - 必须不包含任何非英文字符
+                const isValidPrompt = photo.image_prompt && photo.image_prompt.trim() && !containsNonEnglish;
+                
+                // 3. 如果 prompt 有效，就使用它；否则，强制使用我们的备用 prompt
+                const finalPrompt = isValidPrompt ? photo.image_prompt : 'a beautiful scenery, anime style, cinematic lighting';
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}`;
+
+                // --- 4. 这就是我们的“图片加载检查器” ---
+                const img = new Image(); // 在后台创建一个临时的<img>标签
+                
+                // a. 如果图片成功加载
+                img.onload = function() {
+                    // 就把这张成功的图片设置为背景
+                    item.style.backgroundImage = `url(${this.src})`;
+                };
+
+                // b. 如果图片加载失败（比如prompt错误，服务器返回404或损坏的图片）
+                img.onerror = function() {
+                    // 就立刻使用我们准备好的、绝对不会出错的“备用图片”
+                    console.warn('图片生成失败，已使用备用图片。失败的Prompt:', finalPrompt);
+                    item.style.backgroundImage = `url(${fallbackImageUrl})`;
+                };
+                
+                // c. 命令浏览器开始加载图片
+                img.src = imageUrl;
+                // --- 检查器工作结束 ---
+                // ▲▲▲ 修复结束 ▲▲▲
+            });
+        }
+// ▼▼▼ 【全新V2.0】这是AI浏览器功能的【全部核心JS代码】，请完整粘贴 ▼▼▼
+
+        /**
+         * 【全新 | V2.0 AI指令强化版】当用户点击“重新生成”时，调用AI生成模拟浏览器历史
+         */
+        async function handleGenerateBrowserHistory() {
+            if (!activeCharacterId) return;
+            const chat = state.chats[activeCharacterId];
+            if (!chat) return;
+        
+            await showCustomAlert("请稍候...", `正在模拟“${chat.name}”的网上冲浪足迹...`);
+        
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            if (!proxyUrl || !apiKey || !model) {
+                alert('API未配置，无法生成内容。');
+                return;
+            }
+
+            // 【修复】定义一个更安全的用户显示名
+            const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+        
+            const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
+            const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
+            const worldBookContext = (chat.settings.linkedWorldBookIds || [])
+                .map(bookId => state.worldBooks.find(wb => wb.id === bookId))
+                .filter(Boolean)
+                .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e => e.enabled).map(e => `- ${e.content}`).join('\n')}`)
+                .join('');
+        
+            const systemPrompt = `
+# 你的任务
+你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出【5到8条】TA最近的浏览器搜索/浏览记录。
+
+# 核心规则
+1.  **创造性与合理性**: 记录必须完全符合角色的性格、爱好、职业和生活环境。
+2.  **多样性**: 记录类型要丰富，可以是对知识的探索、对新闻的关注、对兴趣爱好的深入，或者在线购物、看视频等。
+3.  **格式铁律 (最高优先级)**: 你的回复【必须且只能】是一个JSON数组。数组中的每个元素都是一个对象，代表一条浏览记录，且【必须】是以下两种格式之一：
+
+    **格式 A：纯文本帖子/文章**
+    \`\`\`json
+    {
+      "type": "text",
+      "title": "一个引人注目的文章或搜索标题",
+      "url": "一个虚构的、看起来很真实的网址",
+      "content": "一篇200-400字的、详细的文章或帖子正文，支持换行符\\n。"
+    }
+    \`\`\`
+
+    **格式 B：图片生成**
+    \`\`\`json
+    {
+      "type": "image",
+      "title": "描述这张图片的标题或搜索词",
+      "url": "一个虚构的图片网站网址 (如 artstation.com/artwork/...")",
+      "image_prompt": "一段用于生成这张图片的、详细的【英文】关键词, 风格为动漫/插画/二次元等, 禁止真人"
+    }
+    \`\`\`
+
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+- **你的长期记忆**:
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请开始生成这组浏览记录。`;
+        
+            try {
+                const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成你的浏览器记录。" }];
+                let isGemini = proxyUrl.includes('generativelanguage');
+                let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+                
+                const response = isGemini 
+                    ? await fetch(geminiConfig.url, geminiConfig.data) 
+                    : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                            temperature: 0.9,
+                            response_format: { "type": "json_object" } 
+                        })
+                    });
+        
+                if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
+                
+                const data = await response.json();
+                const aiResponseContent = getGeminiResponseText(data);
+                const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+                
+                const simulatedHistory = JSON.parse(cleanedJson);
+                
+                chat.simulatedBrowserHistory = simulatedHistory;
+                await db.chats.put(chat);
+                
+                await renderCharBrowserHistory();
+                
+            } catch (error) {
+                console.error("生成模拟浏览器历史失败:", error);
+                await showCustomAlert("生成失败", `无法生成浏览记录，请检查API配置或稍后再试。\n错误: ${error.message}`);
+            }
+        }
+
+/**
+ * 【全新 | V2.0 动态数据版】渲染角色的浏览器历史记录列表
+ */
+function renderCharBrowserHistory() {
+    const listEl = document.getElementById('char-browser-history');
+    listEl.innerHTML = '';
+    if (!activeCharacterId) return;
+
+    const char = state.chats[activeCharacterId];
+    const history = char.simulatedBrowserHistory || [];
+
+    if (history.length === 0) {
+        listEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">TA的浏览器空空如也，<br>点击右上角刷新按钮生成一些记录吧！</p>';
+        return;
+    }
+
+    history.forEach((item, index) => {
+        const entryEl = document.createElement('div');
+        entryEl.className = 'char-browser-item';
+        entryEl.innerHTML = `
+            <div class="title">${item.title}</div>
+            <div class="url">${item.url}</div>
+        `;
+        // 为每个列表项绑定点击事件，并传入它在数组中的索引
+        entryEl.addEventListener('click', () => openCharArticle(index));
+        listEl.appendChild(entryEl);
+    });
+}
+
+/**
+ * 【全新】打开文章查看页面
+ * @param {number} index - 被点击的历史记录在数组中的索引
+ */
+function openCharArticle(index) {
+    const char = state.chats[activeCharacterId];
+    const articleData = char.simulatedBrowserHistory[index];
+    if (!articleData) return;
+    
+    // 渲染文章内容并切换到文章屏幕
+    renderCharArticle(articleData);
+    switchToCharScreen('char-browser-article-screen');
+}
+
+/**
+ * 【全新】根据文章数据渲染文章查看页面
+ * @param {object} articleData - 单条历史记录的数据对象
+ */
+function renderCharArticle(articleData) {
+    const titleEl = document.getElementById('char-article-title');
+    const contentEl = document.getElementById('char-article-content');
+    
+    titleEl.textContent = articleData.title;
+    contentEl.innerHTML = ''; // 清空旧内容
+
+    if (articleData.type === 'image' && articleData.image_prompt) {
+        // 如果是图片类型，创建一个img标签并使用AI绘画URL
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(articleData.image_prompt)}`;
+        contentEl.innerHTML = `<img src="${imageUrl}" style="max-width: 100%; border-radius: 8px;">`;
+    } else {
+        // 如果是文本类型，直接显示内容，并处理换行
+        contentEl.innerHTML = `<p>${(articleData.content || '内容加载失败...').replace(/\n/g, '</p><p>')}</p>`;
+    }
+}
+
+// ▲▲▲ 全新JS代码粘贴结束 ▲▲▲
+        /**
+         * 【全新 | V3.0 无钱包版 | 最终修复】当用户点击“重新生成”时，调用AI生成模拟淘宝记录
+         */
+        async function handleGenerateTaobaoHistory() {
+            if (!activeCharacterId) return;
+            const chat = state.chats[activeCharacterId];
+            if (!chat) return;
+        
+            await showCustomAlert("请稍候...", `正在模拟“${chat.name}”的购物习惯...`);
+        
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            if (!proxyUrl || !apiKey || !model) {
+                alert('API未配置，无法生成内容。');
+                return;
+            }
+
+            // 【修复】定义一个更安全的用户显示名
+            const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+        
+            const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
+            const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
+            const worldBookContext = (chat.settings.linkedWorldBookIds || [])
+                .map(bookId => state.worldBooks.find(wb => wb.id === bookId))
+                .filter(Boolean)
+                .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e => e.enabled).map(e => `- ${e.content}`).join('\n')}`)
+                .join('');
+        
+            const systemPrompt = `
+# 你的任务
+你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出TA最近的淘宝购物记录。
+
+# 核心规则
+1.  **合理性**: 购买记录必须完全符合角色的性格、爱好和经济状况。
+2.  **格式铁律 (最高优先级)**: 你的回复【必须且只能】是一个【单一的JSON对象】，格式【必须】如下:
+    \`\`\`json
+    {
+      "purchases": [
+        {
+          "itemName": "一个具体、生动的商品名称",
+          "price": 128.80,
+          "status": "已签收",
+          "reason": "这是角色购买这件商品的内心独白或理由，必须使用第一人称“我”来写。",
+          "image_prompt": "一段用于生成这张商品图片的、详细的【英文】关键词, 风格为 realistic product photo, high quality, on a clean white background"
+        }
+      ]
+    }
+    \`\`\`
+    - **purchases**: 一个包含5到8个商品对象的数组。
+    - **status (订单状态)**: 只能从 "已签收", "待发货", "运输中", "待评价" 中选择。
+
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+- **你的长期记忆**:
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请生成包含购买记录的JSON对象。`;
+        
+            try {
+                const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成你的淘宝购买记录。" }];
+                let isGemini = proxyUrl.includes('generativelanguage');
+                let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+                
+                const response = isGemini 
+                    ? await fetch(geminiConfig.url, geminiConfig.data) 
+                    : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                            temperature: 0.9,
+                            response_format: { "type": "json_object" } 
+                        })
+                    });
+        
+                if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
+                
+                const data = await response.json();
+                const aiResponseContent = getGeminiResponseText(data);
+                const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+                
+                const simulatedTaobaoData = JSON.parse(cleanedJson);
+                chat.simulatedTaobaoHistory = simulatedTaobaoData;
+                await db.chats.put(chat);
+                
+                await renderCharTaobao();
+                
+            } catch (error) {
+                console.error("生成模拟淘宝记录失败:", error);
+                await showCustomAlert("生成失败", `无法生成购物记录，请检查API配置或稍后再试。\n错误: ${error.message}`);
+            }
+        }
+
+/**
+ * 【全新】打开并渲染角色的钱包页面
+ */
+function openCharWallet() {
+    renderCharWallet();
+    switchToCharScreen('char-wallet-screen');
+}
+
+/**
+ * 【全新】渲染角色的钱包页面
+ */
+function renderCharWallet() {
+    const contentEl = document.getElementById('char-wallet-content');
+    contentEl.innerHTML = '';
+    const char = state.chats[activeCharacterId];
+    const history = char.simulatedTaobaoHistory || [];
+
+    // 1. 计算总支出
+    const totalExpenses = history.reduce((sum, item) => sum + (item.price || 0), 0);
+
+    // 2. 创建并显示总支出卡片
+    const summaryCard = document.createElement('div');
+    summaryCard.style.cssText = `
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    `;
+    summaryCard.innerHTML = `
+        <p style="color: #8a8a8a; margin: 0 0 10px 0;">本月总支出</p>
+        <p style="font-size: 32px; font-weight: 600; color: #1f1f1f; margin: 0;">¥${totalExpenses.toFixed(2)}</p>
+    `;
+    contentEl.appendChild(summaryCard);
+
+    // 3. 创建并显示支出明细
+    const detailsTitle = document.createElement('h3');
+    detailsTitle.textContent = '支出明细';
+    detailsTitle.style.cssText = `font-size: 16px; color: #555; margin-bottom: 10px;`;
+    contentEl.appendChild(detailsTitle);
+
+    if (history.length === 0) {
+        contentEl.innerHTML += '<p style="text-align:center; color: var(--text-secondary);">暂无支出记录。</p>';
+        return;
+    }
+
+    history.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        `;
+        itemEl.innerHTML = `
+            <div>
+                <p style="font-weight: 500; margin: 0 0 4px 0;">${item.itemName}</p>
+                <p style="font-size: 12px; color: #8a8a8a; margin: 0;">${item.status}</p>
+            </div>
+            <div style="font-weight: 600; font-size: 16px; color: #ff5722;">- ¥${(item.price || 0).toFixed(2)}</div>
+        `;
+        contentEl.appendChild(itemEl);
+    });
+}
+// ▲▲▲ 全新JS代码粘贴结束 ▲▲▲
+        /**
+         * 【V3.0 | 最终修复版】当用户点击“重新生成”时，调用AI生成模拟备忘录
+         */
+        async function handleGenerateSimulatedMemos() {
+            if (!activeCharacterId) return;
+            const chat = state.chats[activeCharacterId];
+            if (!chat) return;
+        
+            await showCustomAlert("请稍候...", `正在请求“${chat.name}”分享TA的备忘录...`);
+        
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            if (!proxyUrl || !apiKey || !model) {
+                alert('请先在API设置中配置好API信息。');
+                return;
+            }
+
+            // 【修复】定义一个更安全的用户显示名
+            const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+        
+            const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
+            const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
+            const worldBookContext = (chat.settings.linkedWorldBookIds || [])
+                .map(bookId => state.worldBooks.find(wb => wb.id === bookId))
+                .filter(Boolean)
+                .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e => e.enabled).map(e => `- ${e.content}`).join('\n')}`)
+                .join('');
+        
+            const systemPrompt = `
+# 你的任务
+你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出【7到9条】TA最近可能会写在手机备忘录里的内容。
+
+# 核心规则
+1.  **创造性与合理性**: 备忘录内容必须完全符合角色的性格、爱好、职业和生活环境。可以是购物清单、待办事项、灵感片段、一些随笔和感悟、草稿等。
+2.  **格式铁律 (最高优先级)**: 你的回复【必须且只能】是一个JSON数组。数组中的每个元素都是一个对象，代表一条备忘录，格式【必须】如下:
+    \`\`\`json
+    [
+      {
+        "title": "备忘录的标题，例如：购物清单 或 周末计划",
+        "content": "备忘录的详细内容，必须支持换行符\\n。"
+      }
+    ]
+    \`\`\`
+
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+- **你的长期记忆**:
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请开始生成这组备忘录。`;
+        
+            try {
+                const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成你的备忘录内容。" }];
+                let isGemini = proxyUrl.includes('generativelanguage');
+                let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+                
+                const response = isGemini 
+                    ? await fetch(geminiConfig.url, geminiConfig.data) 
+                    : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                            temperature: 0.9
+                        })
+                    });
+        
+                if (!response.ok) {
+                     const errorData = await response.json().catch(() => null);
+                     const errorMessage = errorData?.error?.message || response.statusText;
+                     throw new Error(`API 错误: ${response.status} - ${errorMessage}`);
+                }
+                
+                const data = await response.json();
+                const aiResponseContent = getGeminiResponseText(data);
+                const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+                
+                let simulatedMemos;
+                try {
+                    simulatedMemos = JSON.parse(cleanedJson);
+                } catch(e) {
+                    throw new Error(`AI返回了非法的JSON格式，无法解析。原始返回: ${aiResponseContent}`);
+                }
+                
+                if (!Array.isArray(simulatedMemos)) {
+                    throw new Error(`AI返回的数据不是一个数组。原始返回: ${JSON.stringify(simulatedMemos)}`);
+                }
+
+                chat.memos = simulatedMemos.map(memo => ({
+                    id: Date.now() + Math.random(),
+                    title: memo.title,
+                    content: memo.content
+                }));
+                
+                await db.chats.put(chat);
+                await renderCharMemoList();
+                
+            } catch (error) {
+                console.error("生成模拟备忘录失败:", error);
+                await showCustomAlert("生成失败", `无法生成备忘录，请检查API配置或稍后再试。\n错误: ${error.message}`);
+            }
+        }
+// ▼▼▼ 【全新V2.0】这是角色手机高德地图功能的【全部核心JS代码】，请完整粘贴 ▼▼▼
+
+/**
+ * 【全新 | 总入口】当用户点击“重新生成”时，调用AI生成模拟足迹
+ */
+async function handleGenerateAmapHistory() {
+    if (!activeCharacterId) return;
+    const chat = state.chats[activeCharacterId];
+    if (!chat) return;
+
+    await showCustomAlert("请稍候...", `正在生成“${chat.name}”的出行足迹...`);
+
+    const { proxyUrl, apiKey, model } = state.apiConfig;
+    if (!proxyUrl || !apiKey || !model) {
+        alert('API未配置，无法生成内容。');
+        return;
+    }
+    
+    // 【修复】定义一个更安全的用户显示名，避免传递"{{user}}"
+    const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+
+    // (上下文构建逻辑保持不变)
+    const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
+    const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
+    const worldBookContext = (chat.settings.linkedWorldBookIds || [])
+        .map(bookId => state.worldBooks.find(wb => wb.id === bookId))
+        .filter(Boolean)
+        .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e => e.enabled).map(e => `- ${e.content}`).join('\n')}`)
+        .join('');
+
+    const systemPrompt = `
+# 你的任务
+你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出【9到12条】TA最近的“高德地图”出行足迹。
+
+# 核心规则
+1.  **创造性与合理性**: 足迹必须完全符合角色的性格、爱好、职业和生活环境。
+2.  **多样性**: 地点类型要丰富，可以包括餐厅、商场、公园、公司、朋友家等。
+3.  **格式铁律 (最高优先级)**: 你的回复【必须且只能】是一个JSON数组。数组中的每个元素都是一个对象，代表一条足迹，格式【必须】如下:
+    \`\`\`json
+    [
+      {
+        "locationName": "一个具体、生动的地点名称",
+        "address": "一个虚构但看起来很真实的详细地址",
+        "comment": "这是角色对这次出行或这个地点的内心独白或评论，必须使用第一人称“我”来写。",
+        "image_prompt": "(可选)一段用于生成这张地点照片的、详细的【英文】关键词, 风格为 realistic photo, high quality"
+      }
+    ]
+    \`\`\`
+    - **重要**: 大约有【三分之一】的足迹需要包含 \`image_prompt\` 字段来生成一张照片。
+    - **图片**: image_prompt 生成的图片【绝对禁止包含真人】。如果地点是室内，可以生成空无一人的场景；如果是室外，可以只有风景或建筑。
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+- **你的长期记忆**:
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请开始生成这组足迹记录。`;
+
+    try {
+        const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成你的高德地图足迹。" }];
+        let isGemini = proxyUrl.includes('generativelanguage');
+        let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+        
+        const response = isGemini 
+            ? await fetch(geminiConfig.url, geminiConfig.data) 
+            : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                body: JSON.stringify({
+                    model: model,
+                    messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                    temperature: 0.9,
+                    response_format: { "type": "json_object" } 
+                })
+            });
+
+        if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
+        
+        const data = await response.json();
+        const aiResponseContent = getGeminiResponseText(data);
+        const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+        
+        const simulatedAmapData = JSON.parse(cleanedJson);
+        
+        // 4. 将AI生成的足迹存入角色的数据中
+        chat.simulatedAmapHistory = simulatedAmapData;
+        await db.chats.put(chat);
+        
+        // 5. 重新渲染足迹列表
+        await renderCharAmap();
+        
+    } catch (error) {
+        console.error("生成模拟足迹失败:", error);
+        await showCustomAlert("生成失败", `无法生成足迹，请检查API配置或稍后再试。\n错误: ${error.message}`);
+    }
+}
+
+/**
+ * 【全新】渲染角色的高德地图足迹列表
+ */
+function renderCharAmap() {
+    const listEl = document.getElementById('char-amap-list');
+    listEl.innerHTML = '';
+    if (!activeCharacterId) return;
+
+    const char = state.chats[activeCharacterId];
+    const history = char.simulatedAmapHistory || [];
+
+    if (history.length === 0) {
+        listEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">这里还没有留下任何足迹，<br>点击右上角刷新按钮生成一些记录吧！</p>';
+        return;
+    }
+
+    history.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'char-amap-item';
+        
+        let photoHtml = '';
+        if (item.image_prompt) {
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(item.image_prompt)}`;
+            photoHtml = `<div class="amap-item-photo" style="background-image: url('${imageUrl}')" data-comment="${item.comment}"></div>`;
+        }
+
+        itemEl.innerHTML = `
+            <div class="amap-item-header">
+                <div class="amap-item-icon">📍</div>
+                <div class="amap-item-info">
+                    <div class="amap-item-title">${item.locationName}</div>
+                    <div class="amap-item-address">${item.address}</div>
+                </div>
+            </div>
+            <div class="amap-item-body">
+                <div class="amap-item-comment">${item.comment.replace(/\n/g, '<br>')}</div>
+                ${photoHtml}
+            </div>
+            <div class="amap-item-footer">今天 ${String(Math.floor(Math.random() * 24)).padStart(2,'0')}:${String(Math.floor(Math.random() * 60)).padStart(2,'0')}</div>
+        `;
+        listEl.appendChild(itemEl);
+    });
+}
+
+// ▲▲▲ 全新JS代码粘贴结束 ▲▲▲
+        /**
+         * 【全新 V3.0 | 支持AI绘图】当用户点击“重新生成”时，调用AI生成模拟App使用记录
+         */
+        async function handleGenerateAppUsage() {
+            if (!activeCharacterId) return;
+            const chat = state.chats[activeCharacterId];
+            if (!chat) return;
+
+            await showCustomAlert("请稍候...", `正在分析“${chat.name}”的手机使用习惯...`);
+
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            if (!proxyUrl || !apiKey || !model) {
+                alert('API未配置，无法生成内容。');
+                return;
+            }
+            
+            const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+
+            const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
+            const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
+            const worldBookContext = (chat.settings.linkedWorldBookIds || [])
+                .map(bookId => state.worldBooks.find(wb => wb.id === bookId))
+                .filter(Boolean)
+                .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e => e.enabled).map(e => `- ${e.content}`).join('\n')}`)
+                .join('');
+
+            // ▼▼▼ 【核心修改：这是全新的、支持AI绘图的指令】 ▼▼▼
+            const systemPrompt = `
+# 你的任务
+你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出TA最近一天的【手机App屏幕使用时间】记录，总共约20条。
+
+# 核心规则
+1.  **创造性与多样性**: 生成的App列表【不必局限于】角色手机主屏幕上已有的App。你可以自由地虚构TA可能使用的其他App，例如 Instagram, Twitter, 各种游戏 (如：原神, 王者荣耀), 视频App (如：抖音, YouTube), 学习或工作软件等，这能更好地体现角色的隐藏兴趣和生活习惯。
+2.  **合理性**: 使用时长和App类型必须完全符合角色的性格、爱好、职业和生活环境。
+3.  **格式铁律 (最高优先级)**: 你的回复【必须且只能】是一个JSON数组。数组中的每个元素都是一个对象，代表一个App的使用记录，格式【必须】如下:
+    \`\`\`json
+    [
+      {
+        "appName": "App的名称 (例如: 微信, 微博, 原神)",
+        "usageTimeMinutes": 125,
+        "category": "App的分类 (例如: 社交, 游戏, 影音, 工具, 阅读, 购物)",
+        "image_prompt": "一段用于生成这个App【图标】的、简洁的【英文】关键词。风格必须是 modern app icon, flat design, simple, clean background"
+      }
+    ]
+    \`\`\`
+
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+- **你的长期记忆**:
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请开始生成这组App使用记录。`;
+            // ▲▲▲ 修改结束 ▲▲▲
+
+            try {
+                const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成你的App使用记录。" }];
+                let isGemini = proxyUrl.includes('generativelanguage');
+                let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+                
+                const response = isGemini 
+                    ? await fetch(geminiConfig.url, geminiConfig.data) 
+                    : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                            temperature: 0.9,
+                            response_format: { "type": "json_object" } 
+                        })
+                    });
+
+                if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
+                
+                const data = await response.json();
+                const aiResponseContent = getGeminiResponseText(data);
+                const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+                
+                const simulatedUsageData = JSON.parse(cleanedJson);
+                
+                chat.simulatedAppUsage = simulatedUsageData;
+                await db.chats.put(chat);
+                
+                await renderCharAppUsage();
+                
+            } catch (error) {
+                console.error("生成模拟App使用记录失败:", error);
+                await showCustomAlert("生成失败", `无法生成记录，请检查API配置或稍后再试。\n错误: ${error.message}`);
+            }
+        }
+
+        /**
+         * 【全新 V2.0 | AI绘图版】渲染角色的App使用记录列表
+         */
+        function renderCharAppUsage() {
+            const listEl = document.getElementById('char-usage-list');
+            listEl.innerHTML = '';
+            if (!activeCharacterId) return;
+
+            const char = state.chats[activeCharacterId];
+            const usageData = (char.simulatedAppUsage || []).sort((a, b) => b.usageTimeMinutes - a.usageTimeMinutes);
+
+            if (usageData.length === 0) {
+                listEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">这里还没有任何使用记录，<br>点击右上角刷新按钮生成一些吧！</p>';
+                return;
+            }
+
+            usageData.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'char-usage-item';
+                
+                const hours = Math.floor(item.usageTimeMinutes / 60);
+                const minutes = item.usageTimeMinutes % 60;
+                let timeString = '';
+                if (hours > 0) timeString += `${hours}小时`;
+                if (minutes > 0) timeString += `${minutes}分钟`;
+                if (!timeString) timeString = '小于1分钟';
+
+                // ▼▼▼ 【核心修改：动态生成图标URL】 ▼▼▼
+                // 1. 如果AI提供了image_prompt，就使用它；否则，提供一个通用的备用指令
+                const prompt = item.image_prompt || `modern app icon for ${item.appName}, flat design, simple`;
+                // 2. 使用AI绘画API生成图标
+                const iconUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
+                // ▲▲▲ 修改结束 ▲▲▲
+
+                itemEl.innerHTML = `
+                    <img src="${iconUrl}" class="usage-item-icon">
+                    <div class="usage-item-info">
+                        <div class="usage-item-name">${item.appName}</div>
+                        <div class="usage-item-category">${item.category}</div>
+                    </div>
+                    <div class="usage-item-time">${timeString}</div>
+                `;
+                listEl.appendChild(itemEl);
+            });
+        }
+// ▲▲▲ 全新JS代码粘贴结束 ▲▲▲
+        /**
+         * 【全新 V2.0 | 最终兼容版】当用户点击“重新生成”时，调用AI生成模拟歌单
+         */
+        async function handleGenerateSimulatedMusic() {
+            if (!activeCharacterId) return;
+            const chat = state.chats[activeCharacterId];
+            if (!chat) return;
+
+            await showCustomAlert("请稍候...", `正在请求“${chat.name}”分享TA的私人歌单...`);
+
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            if (!proxyUrl || !apiKey || !model) {
+                alert('请先在API设置中配置好API信息。');
+                return;
+            }
+            
+            const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
+
+            const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
+            const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
+            const worldBookContext = (chat.settings.linkedWorldBookIds || [])
+                .map(bookId => state.worldBooks.find(wb => wb.id === bookId))
+                .filter(Boolean)
+                .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e => e.enabled).map(e => `- ${e.content}`).join('\n')}`)
+                .join('');
+
+            const systemPrompt = `
+# 你的任务
+你是一个虚拟音乐品味模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，挑选出【6到9首】最能代表TA此刻心情或品味的歌曲。
+
+# 核心规则
+1.  **创造性与合理性**: 歌单必须完全符合角色的性格、爱好和生活背景。
+2.  **多样性**: 歌曲风格可以多样，但必须逻辑自洽。
+3.  **格式铁律 (最高优先级)**: 
+    - 你的回复【必须且只能】是一个JSON数组格式的字符串。
+    - 【绝对禁止】在JSON数组前后添加任何多余的文字、解释、或 markdown 标记 (如 \`\`\`json)。
+    - 你的回复必须以 \`[\` 开始，并以 \`]\` 结束。
+    - 数组中的每个元素都是一个对象，代表一首歌，格式【必须】如下:
+    \`\`\`json
+    [
+      {
+        "songName": "歌曲的准确名称",
+        "artistName": "歌曲的准确艺术家/歌手名"
+      }
+    ]
+    \`\`\`
+
+# 供你参考的上下文
+- **你的角色设定**: ${chat.settings.aiPersona}
+- **你的长期记忆**:
+${longTermMemoryContext}
+${worldBookContext}
+- **你最近和“${userDisplayNameForAI}”的对话摘要**:
+${recentHistoryWithUser}
+
+现在，请生成这份歌单。`;
+
+            try {
+                const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成你的歌单。" }];
+                let isGemini = proxyUrl.includes('generativelanguage');
+                let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
+                
+                const response = isGemini 
+                    ? await fetch(geminiConfig.url, geminiConfig.data) 
+                    : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{role: 'system', content: systemPrompt}, ...messagesForApi],
+                            temperature: 1.0,
+                        })
+                    });
+
+                if (!response.ok) throw new Error(`API 错误: ${response.statusText}`);
+                
+                const data = await response.json();
+                const aiResponseContent = getGeminiResponseText(data);
+                const cleanedJson = aiResponseContent.replace(/^```json\s*/, '').replace(/```$/, '');
+                const songPicks = JSON.parse(cleanedJson);
+
+                await showCustomAlert("请稍候...", `歌单已生成，正在从网络获取 ${songPicks.length} 首歌曲的详细信息...`);
+
+                // ▼▼▼ 核心修改就在这里 ▼▼▼
+                const songDetailPromises = songPicks.map(async (pick) => {
+                    // 1. 首先尝试网易云音乐
+                    let searchResults = await searchNeteaseMusic(pick.songName, pick.artistName);
+                    
+                    // 2. 如果网易云没有结果，则尝试QQ音乐作为备用
+                    if (!searchResults || searchResults.length === 0) {
+                        console.log(`网易云音乐未找到“${pick.songName}”，正在尝试QQ音乐作为备用源...`);
+                        searchResults = await searchTencentMusic(pick.songName);
+                    }
+
+                    // 3. 如果任何一个源找到了结果，就继续获取可播放链接
+                    if (searchResults.length > 0) {
+                        // getPlayableSongDetails 函数内部已经有备用源逻辑，非常稳健
+                        return getPlayableSongDetails(searchResults[0]);
+                    }
+                    
+                    // 4. 如果两个源都找不到，则返回null
+                    console.warn(`所有音乐源都未能找到歌曲：“${pick.songName} - ${pick.artistName}”`);
+                    return null;
+                });
+                // ▲▲▲ 修改结束 ▲▲▲
+
+                const fullSongObjects = (await Promise.all(songDetailPromises)).filter(Boolean);
+
+                chat.simulatedMusicPlaylist = fullSongObjects;
+                await db.chats.put(chat);
+                
+                await renderCharMusicScreen();
+                
+            } catch (error) {
+                console.error("生成模拟歌单失败:", error);
+                await showCustomAlert("生成失败", `无法生成歌单，请检查API配置或稍后再试。\n错误: ${error.message}`);
+            }
+        }
+
+/**
+ * 【全新】渲染角色的网易云音乐列表
+ */
+function renderCharMusicScreen() {
+    const listEl = document.getElementById('char-music-list');
+    listEl.innerHTML = '';
+    if (!activeCharacterId) return;
+
+    const char = state.chats[activeCharacterId];
+    const playlist = char.simulatedMusicPlaylist || [];
+
+    if (playlist.length === 0) {
+        listEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">TA的歌单还是空的，<br>点击右上角刷新按钮生成一些歌曲吧！</p>';
+        return;
+    }
+
+    playlist.forEach((track, index) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'char-music-item';
+        itemEl.innerHTML = `
+            <img src="${track.cover}" class="music-item-cover">
+            <div class="music-item-info">
+                <div class="music-item-name">${track.name}</div>
+                <div class="music-item-artist">${track.artist}</div>
+            </div>
+        `;
+        // 为每个列表项绑定点击事件，并传入完整的歌曲对象
+        itemEl.addEventListener('click', () => playCharSong(track));
+        listEl.appendChild(itemEl);
+    });
+}
+
+/* ▼▼▼ 请用这整块【全新 V3.0 JS代码】，完整替换所有旧的 char-player-modal 相关JS ▼▼▼ */
+
+let charPlayerState = {
+    currentPlaylist: [],
+    currentIndex: -1,
+    isPlaying: false,
+    playMode: 'order', // 'order', 'random', 'single'
+    lrcUpdateInterval: null,
+    // 【核心新增】
+    parsedLyrics: [],
+    currentLyricIndex: -1
+};
+
+/**
+ * 播放角色手机中的歌曲 (V3.0 - 适配新UI和歌词)
+ * @param {object} songObject - 包含所有信息的完整歌曲对象
+ */
+function playCharSong(songObject) {
+    const player = document.getElementById('char-audio-player');
+    const modal = document.getElementById('char-music-player-modal');
+    
+    if (charPlayerState.lrcUpdateInterval) clearInterval(charPlayerState.lrcUpdateInterval);
+    player.pause();
+    
+    const songIndex = charPlayerState.currentPlaylist.findIndex(s => s.src === songObject.src);
+    if (songIndex > -1) {
+        charPlayerState.currentIndex = songIndex;
+    } else {
+        charPlayerState.currentPlaylist = [songObject];
+        charPlayerState.currentIndex = 0;
+    }
+
+    // 更新UI
+    document.getElementById('char-music-player-title').textContent = songObject.name;
+    document.getElementById('char-music-artist').textContent = songObject.artist;
+    document.getElementById('char-music-cover').src = songObject.cover;
+    
+    // 【核心新增】解析歌词
+    charPlayerState.parsedLyrics = parseLRC(songObject.lrcContent || "");
+    renderCharLyrics(); // 渲染歌词
+
+    // 设置音频源并播放
+    if (songObject.isLocal) {
+        const blob = new Blob([songObject.src], { type: songObject.fileType || 'audio/mpeg' });
+        player.src = URL.createObjectURL(blob);
+    } else {
+        player.src = songObject.src;
+    }
+    player.play().catch(e => console.error("音频播放失败:", e));
+
+    player.onloadedmetadata = () => {
+        document.getElementById('char-music-total-time').textContent = formatMusicTime(player.duration);
+        charPlayerState.lrcUpdateInterval = setInterval(updateCharMusicProgress, 500);
+    };
+
+    modal.classList.add('visible');
+}
+
+/**
+ * 关闭角色手机的音乐播放器 (V3.0)
+ */
+function closeCharMusicPlayer() {
+    const modal = document.getElementById('char-music-player-modal');
+    const player = document.getElementById('char-audio-player');
+    
+    if (charPlayerState.lrcUpdateInterval) clearInterval(charPlayerState.lrcUpdateInterval);
+    player.pause();
+    player.src = ''; 
+    modal.classList.remove('visible');
+    charPlayerState.isPlaying = false;
+    document.getElementById('char-vinyl-container').classList.remove('spinning');
+}
+
+/**
+ * 更新播放器进度条、时间和歌词 (核心修改)
+ */
+function updateCharMusicProgress() {
+    const player = document.getElementById('char-audio-player');
+    if (!player.duration) return;
+
+    const currentTime = player.currentTime;
+    const duration = player.duration;
+    document.getElementById('char-music-progress-fill').style.width = `${(currentTime / duration) * 100}%`;
+    document.getElementById('char-music-current-time').textContent = formatMusicTime(currentTime);
+
+    // 【核心新增】调用歌词更新函数
+    updateCharActiveLyric(currentTime);
+}
+
+
+/**
+ * 【全新】渲染角色播放器的歌词列表
+ */
+function renderCharLyrics() {
+    const lyricsContainer = document.getElementById('char-music-lyrics');
+    lyricsContainer.innerHTML = '';
+    charPlayerState.currentLyricIndex = -1; // 重置索引
+    if (!charPlayerState.parsedLyrics || charPlayerState.parsedLyrics.length === 0) {
+        lyricsContainer.innerHTML = '<p>♪ 暂无歌词 ♪</p>';
+        return;
+    }
+    charPlayerState.parsedLyrics.forEach((line, index) => {
+        const p = document.createElement('p');
+        p.textContent = line.text;
+        p.dataset.index = index;
+        lyricsContainer.appendChild(p);
+    });
+}
+
+/**
+ * 【全新】更新当前高亮的歌词
+ */
+function updateCharActiveLyric(currentTime) {
+    const lyrics = charPlayerState.parsedLyrics;
+    if (lyrics.length === 0) return;
+
+    let newLyricIndex = -1;
+    for (let i = 0; i < lyrics.length; i++) {
+        if (currentTime >= lyrics[i].time) {
+            newLyricIndex = i;
+        } else {
+            break;
+        }
+    }
+    if (newLyricIndex === charPlayerState.currentLyricIndex) return;
+    charPlayerState.currentLyricIndex = newLyricIndex;
+    
+    // 更新UI
+    const lyricsContainer = document.getElementById('char-music-lyrics');
+    const lines = lyricsContainer.querySelectorAll('p');
+    lines.forEach(line => line.classList.remove('active'));
+    
+    if (newLyricIndex > -1) {
+        const activeLine = lyricsContainer.querySelector(`p[data-index="${newLyricIndex}"]`);
+        if (activeLine) {
+            activeLine.classList.add('active');
+            // 计算滚动位置，使当前行居中
+            const offset = (lyricsContainer.clientHeight / 2) - activeLine.offsetTop - (activeLine.offsetHeight / 2);
+            lines.forEach(line => {
+                line.style.transform = `translateY(${offset}px)`;
+            });
+        }
+    }
+}
+
+
+/**
+ * 播放下一首歌
+ */
+function playNextCharSong() {
+    if (charPlayerState.currentPlaylist.length === 0) return;
+    let nextIndex;
+    switch(charPlayerState.playMode) {
+        case 'random':
+            nextIndex = Math.floor(Math.random() * charPlayerState.currentPlaylist.length);
+            break;
+        case 'single':
+            // 单曲循环，重新播放当前歌曲
+            playCharSong(charPlayerState.currentPlaylist[charPlayerState.currentIndex]);
+            return;
+        case 'order':
+        default:
+            nextIndex = (charPlayerState.currentIndex + 1) % charPlayerState.currentPlaylist.length;
+            break;
+    }
+    playCharSong(charPlayerState.currentPlaylist[nextIndex]);
+}
+
+/**
+ * 播放上一首歌
+ */
+function playPrevCharSong() {
+    if (charPlayerState.currentPlaylist.length === 0) return;
+    const newIndex = (charPlayerState.currentIndex - 1 + charPlayerState.currentPlaylist.length) % charPlayerState.currentPlaylist.length;
+    playCharSong(charPlayerState.currentPlaylist[newIndex]);
+}
+
+/**
+ * 切换播放模式
+ */
+function changeCharPlayMode() {
+    const modes = ['order', 'random', 'single'];
+    const currentModeIndex = modes.indexOf(charPlayerState.playMode);
+    charPlayerState.playMode = modes[(currentModeIndex + 1) % modes.length];
+    document.getElementById('char-music-mode-btn').textContent = {'order': '顺序', 'random': '随机', 'single': '单曲'}[charPlayerState.playMode];
+}
+
+
+/**
+ * 【总入口】为新播放器的所有按钮和事件绑定功能
+ */
+function setupCharPlayerControls() {
+    const player = document.getElementById('char-audio-player');
+    const playBtn = document.getElementById('char-music-play-pause-btn');
+    const vinyl = document.getElementById('char-vinyl-container');
+
+    playBtn.addEventListener('click', () => {
+        if (player.paused) {
+            if(charPlayerState.currentIndex > -1) player.play();
+        } else {
+            player.pause();
+        }
+    });
+    
+    player.onplay = () => {
+        playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>`;
+        vinyl.classList.add('spinning');
+        charPlayerState.isPlaying = true;
+    };
+    player.onpause = () => {
+        playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>`;
+        vinyl.classList.remove('spinning');
+        charPlayerState.isPlaying = false;
+    };
+    player.onended = () => {
+        vinyl.classList.remove('spinning');
+        charPlayerState.isPlaying = false;
+        playNextCharSong();
+    };
+
+    document.getElementById('char-music-prev-btn').addEventListener('click', playPrevCharSong);
+    document.getElementById('char-music-next-btn').addEventListener('click', playNextCharSong);
+    document.getElementById('char-music-mode-btn').addEventListener('click', changeCharPlayMode);
+
+    document.getElementById('char-music-progress-bar').addEventListener('click', (e) => {
+        if (!player.duration) return;
+        const bar = e.currentTarget;
+        const clickX = e.offsetX;
+        player.currentTime = (clickX / bar.clientWidth) * player.duration;
+    });
+}
+/* ▲▲▲ JS代码替换结束 ▲▲▲ */
 
                // ===================================================================
                 // 4. 初始化函数 init()
                 // ===================================================================
                 async function init() {
+setupCharPlayerControls();
     // ▼▼▼ 【核心修复】将内部函数暴露到全局，以便HTML中的 onclick 可以调用它们 ▼▼▼
     window.showScreen = showScreen;
     window.openRenderingRulesScreen = openRenderingRulesScreen;
@@ -26686,6 +30379,12 @@ async function importSingleChat(file) {
                     window.renderApiSettingsProxy = renderApiSettings;
                     window.renderWallpaperScreenProxy = renderWallpaperScreen;
                     window.renderWorldBookScreenProxy = renderWorldBookScreen;
+// ▼▼▼ 【核心修复】将内部函数暴露到全局，以便HTML中的 onclick 可以调用它们 ▼▼▼
+window.openCharacterSelector = openCharacterSelector;
+window.openCharApp = openCharApp;
+window.switchToMyPhone = switchToMyPhone;
+window.switchToCharHomeScreen = switchToCharHomeScreen;
+// ▲▲▲ 修复结束 ▲▲▲
         
                     await loadAllDataFromDB();
                     applyStatusBarVisibility(); // <-- 新增这一行
@@ -30735,6 +34434,80 @@ document.getElementById('import-single-chat-input').addEventListener('change', (
     e.target.value = null; // 清空以便下次能选择同一个文件
 });
 // ▲▲▲ 新增代码结束 ▲▲▲
+// ▼▼▼ 【全新】角色手机功能事件绑定 ▼▼▼
+document.getElementById('add-char-memo-btn').addEventListener('click', () => openMemoEditor());
+document.getElementById('add-char-diary-btn').addEventListener('click', () => openDiaryEditor());
+// ▲▲▲ 新增事件绑定结束 ▲▲▲
+        // “重新生成”按钮
+        document.getElementById('regenerate-char-qq-btn').addEventListener('click', handleGenerateSimulatedQQ);
+
+        // 使用事件委托，处理模拟聊天【列表】的点击事件
+        document.getElementById('char-chat-list').addEventListener('click', (e) => {
+            const item = e.target.closest('.chat-list-item');
+            if (item && item.dataset.conversationIndex) {
+                const index = parseInt(item.dataset.conversationIndex);
+                if (!isNaN(index)) {
+                    // 【核心修改】现在调用新函数，打开全屏页面
+                    openCharSimulatedConversation(index);
+                }
+            }
+        });
+
+        // 【新增】为模拟对话页面的“返回”按钮绑定事件
+        document.getElementById('back-to-char-qq-list-btn').addEventListener('click', () => {
+            switchToCharScreen('char-qq-screen');
+        });
+
+        // 【新增】为模拟对话页面的“发送”按钮绑定提示事件
+        document.getElementById('char-simulated-send-btn').addEventListener('click', () => {
+            alert("这是模拟对话，无法发送消息哦~");
+        });
+
+        // ▲▲▲ 新增事件绑定结束 ▲▲▲
+        // 1. 为“重新生成”按钮绑定我们刚刚创建的核心函数
+        document.getElementById('regenerate-char-album-btn').addEventListener('click', handleGenerateSimulatedAlbum);
+
+        // 2. 使用事件委托，为整个相册网格添加点击事件
+        document.getElementById('char-album-grid').addEventListener('click', (e) => {
+            // 检查被点击的是否是一张照片
+            const photoItem = e.target.closest('.char-photo-item');
+            
+            // 如果是，并且它身上存有我们之前放进去的“照片详情”
+            if (photoItem && photoItem.dataset.description) {
+                const description = photoItem.dataset.description;
+                
+                // 就用一个漂亮的弹窗把详情显示出来
+                showCustomAlert("照片详情", description.replace(/\n/g, '<br>'));
+            }
+        });
+        document.getElementById('regenerate-char-browser-btn').addEventListener('click', handleGenerateBrowserHistory);
+        // 1. 将“重新生成”按钮与AI生成函数绑定
+        document.getElementById('regenerate-char-taobao-btn').addEventListener('click', handleGenerateTaobaoHistory);
+       
+        
+        // 3. 使用事件委托，为购买记录列表添加点击事件，用于显示“购买理由”
+        document.getElementById('char-product-grid').addEventListener('click', (e) => {
+            const item = e.target.closest('.char-product-item');
+            if (item && item.dataset.reason) {
+                const reason = item.dataset.reason;
+                showCustomAlert("TA的想法...", reason.replace(/\n/g, '<br>'));
+            }
+        });
+        
+        // 4. 【核心】将 openCharWallet 函数暴露到全局，以便 onclick 可以调用
+        window.openCharWallet = openCharWallet;
+document.getElementById('regenerate-char-memo-btn').addEventListener('click', handleGenerateSimulatedMemos);
+document.getElementById('char-memo-detail-back-btn').addEventListener('click', () => switchToCharScreen('char-memo-screen'));
+// 在 init() 的事件监听器区域添加
+document.getElementById('regenerate-char-diary-btn').addEventListener('click', handleGenerateSimulatedDiaries);
+document.getElementById('add-char-diary-btn').addEventListener('click', handleWriteNewDiaryEntry);
+document.getElementById('char-diary-detail-back-btn').addEventListener('click', () => switchToCharScreen('char-diary-screen'));
+document.getElementById('regenerate-char-amap-btn').addEventListener('click', handleGenerateAmapHistory);
+document.getElementById('regenerate-char-usage-btn').addEventListener('click', handleGenerateAppUsage);
+        document.getElementById('regenerate-char-music-btn').addEventListener('click', handleGenerateSimulatedMusic);
+        document.getElementById('close-char-music-player-btn').addEventListener('click', closeCharMusicPlayer);
+
+
                     showScreen('home-screen');
                 }
         
@@ -30917,5 +34690,6 @@ document.getElementById('import-single-chat-input').addEventListener('change', (
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+<audio id="char-audio-player" preload="auto"></audio>
 </body>
 </html>
