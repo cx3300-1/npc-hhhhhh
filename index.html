@@ -27738,7 +27738,7 @@ document.getElementById('thoughts-history-list').addEventListener('click', (e) =
             });
         }
 
-        /**
+/**
          * 当用户从下拉框选择一个主题预设时，加载该预设
          */
         async function handleThemePresetSelectionChange() {
@@ -27748,35 +27748,62 @@ document.getElementById('thoughts-history-list').addEventListener('click', (e) =
         
             const preset = await db.appearancePresets.get(selectedId);
             if (preset) {
-                const themeRadio = document.querySelector(`input[name="theme-select"][value="${preset.value}"]`);
+                // ▼▼▼ 核心修改 ▼▼▼
+                // 1. 从保存的对象中分别获取基础主题和自定义CSS
+                const baseTheme = preset.value.base || 'default';
+                const customCss = preset.value.custom || '';
+
+                // 2. 应用基础主题（勾选对应的单选框）
+                const themeRadio = document.querySelector(`input[name="theme-select"][value="${baseTheme}"]`);
                 if (themeRadio) {
                     themeRadio.checked = true;
-                    updateSettingsPreview(); // 实时更新预览
                 }
+
+                // 3. 将保存的CSS加载回输入框
+                const customCssInput = document.getElementById('custom-css-input');
+                customCssInput.value = customCss;
+
+                // 4. 立刻刷新预览区，让效果显示出来
+                updateSettingsPreview(); 
+                // ▲▲▲ 修改结束 ▲▲▲
             }
         }
         
-        /**
+/**
          * 将当前选择的气泡主题保存为一个新的预设
          */
         async function saveThemePreset() {
             const name = await showCustomPrompt('保存主题预设', '请输入预设名称');
             if (!name || !name.trim()) return;
         
+            // ▼▼▼ 核心修改 ▼▼▼
+            // 1. 获取基础主题的选择
             const selectedThemeRadio = document.querySelector('input[name="theme-select"]:checked');
             const themeValue = selectedThemeRadio ? selectedThemeRadio.value : 'default';
+
+            // 2. 获取自定义CSS的内容
+            const cssValue = document.getElementById('custom-css-input').value.trim();
+
+            // 3. 将基础主题和自定义CSS打包成一个对象进行保存
+            const presetValueObject = {
+                base: themeValue,
+                custom: cssValue
+            };
+            // ▲▲▲ 修改结束 ▲▲▲
         
             const existingPreset = await db.appearancePresets.where({ name: name.trim(), type: 'bubble_theme' }).first();
             if (existingPreset) {
                 const confirmed = await showCustomConfirm('覆盖预设', `名为 “${name.trim()}” 的预设已存在。要覆盖它吗？`, { confirmButtonClass: 'btn-danger' });
                 if (!confirmed) return;
                 
-                await db.appearancePresets.update(existingPreset.id, { value: themeValue });
+                // 保存打包后的对象
+                await db.appearancePresets.update(existingPreset.id, { value: presetValueObject });
             } else {
                 await db.appearancePresets.add({
                     name: name.trim(),
                     type: 'bubble_theme',
-                    value: themeValue
+                    // 保存打包后的对象
+                    value: presetValueObject
                 });
             }
         
@@ -34703,5 +34730,6 @@ document.getElementById('regenerate-char-usage-btn').addEventListener('click', h
 <audio id="char-audio-player" preload="auto"></audio>
 </body>
 </html>
+
 
 
