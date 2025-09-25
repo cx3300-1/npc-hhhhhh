@@ -74,7 +74,7 @@
             border-top: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 5px; 
+            gap: 5px;
         }
         
         /* --- End of Replacement Code --- */
@@ -13142,7 +13142,6 @@ async function cleanupRedundantData() {
     }
 }
 // ▲▲▲ 粘贴结束 ▲▲▲        
-        // ▼▼▼ 【这是导出函数修复版】 ▼▼▼
         async function exportBackup() {
             try {
                 const backupData = {
@@ -13211,83 +13210,75 @@ async function cleanupRedundantData() {
             }
         }
         
-        // ▼▼▼ 用这个【已包含 memories】的版本，完整替换旧的 importBackup 函数 ▼▼▼
-        // ▼▼▼ 【这是导入函数修复版】 ▼▼▼
-        async function importBackup(file) {
-            if (!file) return;
-        
-            const confirmed = await showCustomConfirm(
-                '严重警告！',
-                '导入备份将完全覆盖您当前的所有数据，包括聊天、动态、设置等。此操作不可撤销！您确定要继续吗？',
-                { confirmButtonClass: 'btn-danger' }
-            );
-        
-            if (!confirmed) return;
-        
+        /**
+         * 【V2.0 | iOS 大文件导出优化版】
+         * 通过分块JSON.stringify来降低内存峰值，提高在iOS上的成功率
+         */
+        async function exportBackup() {
             try {
-                const text = await file.text();
-                const data = JSON.parse(text);
-        
-                await db.transaction('rw', db.tables, async () => {
-                    for (const table of db.tables) {
-                        await table.clear();
-                    }
-        
-                    if (Array.isArray(data.chats)) await db.chats.bulkPut(data.chats);
-// ▼▼▼ 【全新】世界书旧版本数据兼容代码 ▼▼▼
-if (data.worldBooks && Array.isArray(data.worldBooks)) {
-    console.log("正在检查世界书数据格式以确保兼容性...");
-    data.worldBooks.forEach(book => {
-        // 检查 content 字段是否是旧的字符串格式
-        if (typeof book.content === 'string') {
-            console.log(`检测到旧格式的世界书: "${book.name}"，正在自动迁移...`);
-            
-            // 将旧的字符串内容保存下来
-            const oldContentString = book.content;
-
-            // 【核心转换】将字符串替换为新的数组格式
-            book.content = [{
-                keys: [], // 默认为空关键词
-                comment: "从旧版本自动迁移的条目", // 添加一个备注
-                content: oldContentString, // 将旧的文本放入新结构中
-                enabled: true // 默认启用
-            }];
-        }
-    });
-}
-// ▲▲▲ 代码粘贴结束 ▲▲▲
-                    if (Array.isArray(data.worldBooks)) await db.worldBooks.bulkPut(data.worldBooks);
-                    if (Array.isArray(data.worldBookCategories)) await db.worldBookCategories.bulkPut(data.worldBookCategories);
-                    if (Array.isArray(data.userStickers)) await db.userStickers.bulkPut(data.userStickers);
-                    if (Array.isArray(data.personaPresets)) await db.personaPresets.bulkPut(data.personaPresets);
-                    if (Array.isArray(data.qzonePosts)) await db.qzonePosts.bulkPut(data.qzonePosts);
-                    if (Array.isArray(data.qzoneAlbums)) await db.qzoneAlbums.bulkPut(data.qzoneAlbums);
-                    if (Array.isArray(data.qzonePhotos)) await db.qzonePhotos.bulkPut(data.qzonePhotos);
-                    if (Array.isArray(data.favorites)) await db.favorites.bulkPut(data.favorites);
-                    if (Array.isArray(data.qzoneGroups)) await db.qzoneGroups.bulkPut(data.qzoneGroups);
-                    if (Array.isArray(data.memories)) await db.memories.bulkPut(data.memories);
-                    
-                    if (Array.isArray(data.apiPresets)) await db.apiPresets.bulkPut(data.apiPresets);
-                    if (Array.isArray(data.shoppingProducts)) await db.shoppingProducts.bulkPut(data.shoppingProducts);
-                    if (Array.isArray(data.callRecords)) await db.callRecords.bulkPut(data.callRecords);
-                    // 【核心修复：在这里添加对渲染规则数据的写入操作】
-                    if (Array.isArray(data.renderingRules)) await db.renderingRules.bulkPut(data.renderingRules);
-        
-                    if (data.apiConfig) await db.apiConfig.put(data.apiConfig);
-                    if (data.globalSettings) await db.globalSettings.put(data.globalSettings);
-                    if (data.musicLibrary) await db.musicLibrary.put(data.musicLibrary);
-                    if (data.qzoneSettings) await db.qzoneSettings.put(data.qzoneSettings);
-                });
-        
-                await showCustomAlert('导入成功', '所有数据已成功恢复！应用即将刷新以应用所有更改。');
+                // 1. 先从数据库中分批读取所有数据表
+                // (这部分逻辑与原来相同，读取数据本身内存开销是分散的)
+                const tableNames = [
+                    'chats', 'worldBooks', 'userStickers', 'apiConfig', 'globalSettings',
+                    'personaPresets', 'musicLibrary', 'qzoneSettings', 'qzonePosts',
+                    'qzoneAlbums', 'qzonePhotos', 'favorites', 'qzoneGroups',
+                    'memories', 'worldBookCategories', 'apiPresets', 'shoppingProducts',
+                    'callRecords', 'renderingRules', 'stickerCategories', 'appearancePresets' // 添加所有表
+                ];
                 
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-        
+                const dataPromises = tableNames.map(name => {
+                    if (['apiConfig', 'globalSettings', 'musicLibrary', 'qzoneSettings'].includes(name)) {
+                        return db[name].get('main');
+                    }
+                    return db[name].toArray();
+                });
+
+                const allData = await Promise.all(dataPromises);
+                
+                // 2. 【核心修改】我们不再构建一个巨大的JS对象
+                // 而是创建一个数组，用来存放【分块处理后】的JSON字符串片段
+                const jsonParts = [
+                    `"version": 1`,
+                    `"timestamp": ${Date.now()}`
+                ];
+
+                // 3. 遍历每个数据表的结果，独立地对它们进行JSON.stringify
+                for (let i = 0; i < tableNames.length; i++) {
+                    const tableName = tableNames[i];
+                    const tableData = allData[i];
+                    
+                    if (tableData) { // 确保数据存在
+                        // 对单个表的数据进行字符串化，这是一个较小的内存操作
+                        const jsonString = JSON.stringify(tableData, null, 2);
+                        // 将 "表名": "数据字符串" 的形式存入数组
+                        jsonParts.push(`"${tableName}": ${jsonString}`);
+                    }
+                }
+
+                // 4. 手动构建最终的JSON文件内容
+                // 我们将所有字符串片段用逗号拼接起来，并用大括号包裹
+                // 这避免了对一个巨大的完整对象进行stringify
+                const finalJsonString = `{${jsonParts.join(',\n')}}`;
+
+                // 5. 使用最终的字符串创建Blob并下载 (这部分逻辑与原来相同)
+                const blob = new Blob([finalJsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                await showCustomAlert('导出成功', '已成功导出所有数据！');
+
             } catch (error) {
-                console.error("导入数据时出错:", error);
-                await showCustomAlert('导入失败', `文件格式不正确或数据已损坏: ${error.message}`);
+                console.error("导出数据时出错:", error);
+                // 给出更具体的错误提示
+                if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+                    await showCustomAlert('导出失败', '浏览器存储空间不足，无法创建下载文件。请尝试清理设备空间。');
+                } else {
+                    await showCustomAlert('导出失败', `发生了一个未知错误: ${error.message}`);
+                }
             }
         }
         
@@ -34730,6 +34721,5 @@ document.getElementById('regenerate-char-usage-btn').addEventListener('click', h
 <audio id="char-audio-player" preload="auto"></audio>
 </body>
 </html>
-
 
 
