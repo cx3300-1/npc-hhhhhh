@@ -13142,7 +13142,7 @@ async function cleanupRedundantData() {
     }
 }
 // ▲▲▲ 粘贴结束 ▲▲▲        
-// ▼▼▼ 【这是导出函数修复版】 ▼▼▼
+// ▼▼▼ 【最终闪白屏修复版】 ▼▼▼
         async function exportBackup() {
             try {
                 const backupData = {
@@ -13157,9 +13157,7 @@ async function cleanupRedundantData() {
                     memories, worldBookCategories,
                     apiPresets, shoppingProducts, callRecords,
                     renderingRules, 
-                    // 【核心新增】添加缺失的 appearancePresets 表
                     appearancePresets,
-                    // 【核心新增】添加缺失的 stickerCategories 表
                     stickerCategories
                 ] = await Promise.all([
                     db.chats.toArray(),
@@ -13181,9 +13179,7 @@ async function cleanupRedundantData() {
                     db.shoppingProducts.toArray(),
                     db.callRecords.toArray(),
                     db.renderingRules.toArray(),
-                    // 【核心新增】从数据库读取 appearancePresets
                     db.appearancePresets.toArray(),
-                    // 【核心新增】从数据库读取 stickerCategories
                     db.stickerCategories.toArray()
                 ]);
         
@@ -13194,7 +13190,6 @@ async function cleanupRedundantData() {
                     memories, worldBookCategories,
                     apiPresets, shoppingProducts, callRecords,
                     renderingRules,
-                    // 【核心新增】将新数据添加到备份对象中
                     appearancePresets,
                     stickerCategories
                 });
@@ -13208,8 +13203,28 @@ async function cleanupRedundantData() {
                     href: url,
                     download: `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json`
                 });
+
+                // ==========================================================
+                // ★★★★★ 这就是本次修复的核心！ ★★★★★
+                // ==========================================================
+                
+                // 1. 将隐藏的下载链接添加到页面上（这是更稳妥的做法）
+                document.body.appendChild(link);
+                
+                // 2. 触发点击以下载文件
                 link.click();
-                URL.revokeObjectURL(url);
+
+                // 3. 使用一个短暂的延迟来确保浏览器有足够的时间开始下载
+                setTimeout(() => {
+                    // 4. 从页面上移除这个隐藏的链接
+                    document.body.removeChild(link);
+                    // 5. 销毁临时的下载URL，释放内存
+                    URL.revokeObjectURL(url);
+                }, 100); // 100毫秒的延迟通常足够了
+
+                // ==========================================================
+                // ★★★★★ 修复结束 ★★★★★
+                // ==========================================================
                 
                 await showCustomAlert('导出成功', '已成功导出所有数据！');
         
@@ -34695,5 +34710,4 @@ document.getElementById('regenerate-char-usage-btn').addEventListener('click', h
 <audio id="char-audio-player" preload="auto"></audio>
 </body>
 </html>
-
 
