@@ -13142,6 +13142,7 @@ async function cleanupRedundantData() {
     }
 }
 // ▲▲▲ 粘贴结束 ▲▲▲        
+// ▼▼▼ 【这是导出函数修复版】 ▼▼▼
         async function exportBackup() {
             try {
                 const backupData = {
@@ -13155,8 +13156,11 @@ async function cleanupRedundantData() {
                     qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
                     memories, worldBookCategories,
                     apiPresets, shoppingProducts, callRecords,
-                    // 【核心修复1：在这里添加缺失的变量】
-                    renderingRules 
+                    renderingRules, 
+                    // 【核心新增】添加缺失的 appearancePresets 表
+                    appearancePresets,
+                    // 【核心新增】添加缺失的 stickerCategories 表
+                    stickerCategories
                 ] = await Promise.all([
                     db.chats.toArray(),
                     db.worldBooks.toArray(),
@@ -13176,8 +13180,11 @@ async function cleanupRedundantData() {
                     db.apiPresets.toArray(),
                     db.shoppingProducts.toArray(),
                     db.callRecords.toArray(),
-                    // 【核心修复2：在这里添加对新数据表的读取】
-                    db.renderingRules.toArray()
+                    db.renderingRules.toArray(),
+                    // 【核心新增】从数据库读取 appearancePresets
+                    db.appearancePresets.toArray(),
+                    // 【核心新增】从数据库读取 stickerCategories
+                    db.stickerCategories.toArray()
                 ]);
         
                 Object.assign(backupData, {
@@ -13186,8 +13193,10 @@ async function cleanupRedundantData() {
                     qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
                     memories, worldBookCategories,
                     apiPresets, shoppingProducts, callRecords,
-                    // 【核心修复3：将新数据添加到备份对象中】
-                    renderingRules
+                    renderingRules,
+                    // 【核心新增】将新数据添加到备份对象中
+                    appearancePresets,
+                    stickerCategories
                 });
                 
                 const blob = new Blob(
@@ -13210,114 +13219,79 @@ async function cleanupRedundantData() {
             }
         }
         
-        /**
-         * 【V2.0 | iOS 大文件导出优化版】
-         * 通过分块JSON.stringify来降低内存峰值，提高在iOS上的成功率
-         */
-        async function exportBackup() {
+// ▼▼▼ 【这是导入函数修复版】 ▼▼▼
+        async function importBackup(file) {
+            if (!file) return;
+        
+            const confirmed = await showCustomConfirm(
+                '严重警告！',
+                '导入备份将完全覆盖您当前的所有数据，包括聊天、动态、设置等。此操作不可撤销！您确定要继续吗？',
+                { confirmButtonClass: 'btn-danger' }
+            );
+        
+            if (!confirmed) return;
+        
             try {
-                // 1. 先从数据库中分批读取所有数据表
-                // (这部分逻辑与原来相同，读取数据本身内存开销是分散的)
-                const tableNames = [
-                    'chats', 'worldBooks', 'userStickers', 'apiConfig', 'globalSettings',
-                    'personaPresets', 'musicLibrary', 'qzoneSettings', 'qzonePosts',
-                    'qzoneAlbums', 'qzonePhotos', 'favorites', 'qzoneGroups',
-                    'memories', 'worldBookCategories', 'apiPresets', 'shoppingProducts',
-                    'callRecords', 'renderingRules', 'stickerCategories', 'appearancePresets' // 添加所有表
-                ];
-                
-                const dataPromises = tableNames.map(name => {
-                    if (['apiConfig', 'globalSettings', 'musicLibrary', 'qzoneSettings'].includes(name)) {
-                        return db[name].get('main');
+                const text = await file.text();
+                const data = JSON.parse(text);
+        
+                await db.transaction('rw', db.tables, async () => {
+                    for (const table of db.tables) {
+                        await table.clear();
                     }
-                    return db[name].toArray();
+        
+                    if (Array.isArray(data.chats)) await db.chats.bulkPut(data.chats);
+                    if (data.worldBooks && Array.isArray(data.worldBooks)) {
+                        console.log("正在检查世界书数据格式以确保兼容性...");
+                        data.worldBooks.forEach(book => {
+                            if (typeof book.content === 'string') {
+                                console.log(`检测到旧格式的世界书: "${book.name}"，正在自动迁移...`);
+                                const oldContentString = book.content;
+                                book.content = [{
+                                    keys: [],
+                                    comment: "从旧版本自动迁移的条目",
+                                    content: oldContentString,
+                                    enabled: true
+                                }];
+                            }
+                        });
+                    }
+                    if (Array.isArray(data.worldBooks)) await db.worldBooks.bulkPut(data.worldBooks);
+                    if (Array.isArray(data.worldBookCategories)) await db.worldBookCategories.bulkPut(data.worldBookCategories);
+                    if (Array.isArray(data.userStickers)) await db.userStickers.bulkPut(data.userStickers);
+                    if (Array.isArray(data.personaPresets)) await db.personaPresets.bulkPut(data.personaPresets);
+                    if (Array.isArray(data.qzonePosts)) await db.qzonePosts.bulkPut(data.qzonePosts);
+                    if (Array.isArray(data.qzoneAlbums)) await db.qzoneAlbums.bulkPut(data.qzoneAlbums);
+                    if (Array.isArray(data.qzonePhotos)) await db.qzonePhotos.bulkPut(data.qzonePhotos);
+                    if (Array.isArray(data.favorites)) await db.favorites.bulkPut(data.favorites);
+                    if (Array.isArray(data.qzoneGroups)) await db.qzoneGroups.bulkPut(data.qzoneGroups);
+                    if (Array.isArray(data.memories)) await db.memories.bulkPut(data.memories);
+                    if (Array.isArray(data.apiPresets)) await db.apiPresets.bulkPut(data.apiPresets);
+                    if (Array.isArray(data.shoppingProducts)) await db.shoppingProducts.bulkPut(data.shoppingProducts);
+                    if (Array.isArray(data.callRecords)) await db.callRecords.bulkPut(data.callRecords);
+                    if (Array.isArray(data.renderingRules)) await db.renderingRules.bulkPut(data.renderingRules);
+                    // 【核心新增】导入 appearancePresets 数据
+                    if (Array.isArray(data.appearancePresets)) await db.appearancePresets.bulkPut(data.appearancePresets);
+                    // 【核心新增】导入 stickerCategories 数据
+                    if (Array.isArray(data.stickerCategories)) await db.stickerCategories.bulkPut(data.stickerCategories);
+
+                    if (data.apiConfig) await db.apiConfig.put(data.apiConfig);
+                    if (data.globalSettings) await db.globalSettings.put(data.globalSettings);
+                    if (data.musicLibrary) await db.musicLibrary.put(data.musicLibrary);
+                    if (data.qzoneSettings) await db.qzoneSettings.put(data.qzoneSettings);
                 });
-
-                const allData = await Promise.all(dataPromises);
+        
+                await showCustomAlert('导入成功', '所有数据已成功恢复！应用即将刷新以应用所有更改。');
                 
-                // 2. 【核心修改】我们不再构建一个巨大的JS对象
-                // 而是创建一个数组，用来存放【分块处理后】的JSON字符串片段
-                const jsonParts = [
-                    `"version": 1`,
-                    `"timestamp": ${Date.now()}`
-                ];
-
-                // 3. 遍历每个数据表的结果，独立地对它们进行JSON.stringify
-                for (let i = 0; i < tableNames.length; i++) {
-                    const tableName = tableNames[i];
-                    const tableData = allData[i];
-                    
-                    if (tableData) { // 确保数据存在
-                        // 对单个表的数据进行字符串化，这是一个较小的内存操作
-                        const jsonString = JSON.stringify(tableData, null, 2);
-                        // 将 "表名": "数据字符串" 的形式存入数组
-                        jsonParts.push(`"${tableName}": ${jsonString}`);
-                    }
-                }
-
-                // 4. 手动构建最终的JSON文件内容
-                // 我们将所有字符串片段用逗号拼接起来，并用大括号包裹
-                // 这避免了对一个巨大的完整对象进行stringify
-                const finalJsonString = `{${jsonParts.join(',\n')}}`;
-
-                // 5. 使用最终的字符串创建Blob并下载 (这部分逻辑与原来相同)
-                const blob = new Blob([finalJsonString], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-                URL.revokeObjectURL(url);
-                
-                await showCustomAlert('导出成功', '已成功导出所有数据！');
-
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+        
             } catch (error) {
-                console.error("导出数据时出错:", error);
-                // 给出更具体的错误提示
-                if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-                    await showCustomAlert('导出失败', '浏览器存储空间不足，无法创建下载文件。请尝试清理设备空间。');
-                } else {
-                    await showCustomAlert('导出失败', `发生了一个未知错误: ${error.message}`);
-                }
+                console.error("导入数据时出错:", error);
+                await showCustomAlert('导入失败', `文件格式不正确或数据已损坏: ${error.message}`);
             }
         }
-        
-                function applyCustomFont(fontUrl, isPreviewOnly = false) {
-                    if (!fontUrl) {
-                        dynamicFontStyle.innerHTML = '';
-                        document.getElementById('font-preview').style.fontFamily = '';
-                        return;
-                    }
-                    const fontName = 'custom-user-font';
-                    const newStyle = `
-                        @font-face {
-                          font-family: '${fontName}';
-                          src: url('${fontUrl}');
-                          font-display: swap;
-                        }`;
-                    if (isPreviewOnly) {
-                        const previewStyle = document.getElementById('preview-font-style') || document.createElement('style');
-                        previewStyle.id = 'preview-font-style';
-                        previewStyle.innerHTML = newStyle;
-                        if (!document.getElementById('preview-font-style')) document.head.appendChild(previewStyle);
-                        document.getElementById('font-preview').style.fontFamily = `'${fontName}', 'bulangni', sans-serif`;
-                    } else {
-                        dynamicFontStyle.innerHTML = `
-                            ${newStyle}
-                            body {
-                              font-family: '${fontName}', 'bulangni', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                            }`;
-                    }
-                }
-        
-                async function resetToDefaultFont() {
-                    dynamicFontStyle.innerHTML = ''; 
-                    state.globalSettings.fontUrl = '';
-                    await db.globalSettings.put(state.globalSettings);
-                    document.getElementById('font-url-input').value = '';
-                    document.getElementById('font-preview').style.fontFamily = '';
-                    alert('已恢复默认字体。');
-                }
         
 // ▼▼▼ 【最终修复版】请用这个【已彻底修复数据迁移和语法错误】的版本，完整替换旧的 loadAllDataFromDB 函数 ▼▼▼
 async function loadAllDataFromDB() {
