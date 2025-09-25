@@ -27,6 +27,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         @font-face { font-family: 'bulangni'; src: url('') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
         :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
@@ -13142,74 +13143,86 @@ async function cleanupRedundantData() {
     }
 }
 // ▲▲▲ 粘贴结束 ▲▲▲        
-        // ▼▼▼ 【这是导出函数修复版】 ▼▼▼
-        async function exportBackup() {
-            try {
-                const backupData = {
-                    version: 1, 
-                    timestamp: Date.now()
-                };
+// ▼▼▼ 【请用这个支持ZIP压缩的全新版本】完整替换旧的 exportBackup 函数 ▼▼▼
+async function exportBackup() {
+    try {
+        // 1. 显示“导出中”的提示，改善用户体验
+        await showCustomAlert("请稍候...", "正在准备您的数据备份...");
+
+        const backupData = {
+            version: 1,
+            timestamp: Date.now()
+        };
+
+        // 2. 从数据库收集所有数据的逻辑保持不变
+        const [
+            chats, worldBooks, userStickers, apiConfig, globalSettings,
+            personaPresets, musicLibrary, qzoneSettings, qzonePosts,
+            qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
+            memories, worldBookCategories,
+            apiPresets, shoppingProducts, callRecords,
+            renderingRules, appearancePresets, stickerCategories
+        ] = await Promise.all([
+            db.chats.toArray(),
+            db.worldBooks.toArray(),
+            db.userStickers.toArray(),
+            db.apiConfig.get('main'),
+            db.globalSettings.get('main'),
+            db.personaPresets.toArray(),
+            db.musicLibrary.get('main'),
+            db.qzoneSettings.get('main'),
+            db.qzonePosts.toArray(),
+            db.qzoneAlbums.toArray(),
+            db.qzonePhotos.toArray(),
+            db.favorites.toArray(),
+            db.qzoneGroups.toArray(),
+            db.memories.toArray(),
+            db.worldBookCategories.toArray(),
+            db.apiPresets.toArray(),
+            db.shoppingProducts.toArray(),
+            db.callRecords.toArray(),
+            db.renderingRules.toArray(),
+            db.appearancePresets.toArray(),
+            db.stickerCategories.toArray()
+        ]);
+
+        Object.assign(backupData, {
+            chats, worldBooks, userStickers, apiConfig, globalSettings,
+            personaPresets, musicLibrary, qzoneSettings, qzonePosts,
+            qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
+            memories, worldBookCategories,
+            apiPresets, shoppingProducts, callRecords,
+            renderingRules, appearancePresets, stickerCategories
+        });
         
-                const [
-                    chats, worldBooks, userStickers, apiConfig, globalSettings,
-                    personaPresets, musicLibrary, qzoneSettings, qzonePosts,
-                    qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
-                    memories, worldBookCategories,
-                    apiPresets, shoppingProducts, callRecords,
-                    // 【核心修复1：在这里添加缺失的变量】
-                    renderingRules 
-                ] = await Promise.all([
-                    db.chats.toArray(),
-                    db.worldBooks.toArray(),
-                    db.userStickers.toArray(),
-                    db.apiConfig.get('main'),
-                    db.globalSettings.get('main'),
-                    db.personaPresets.toArray(),
-                    db.musicLibrary.get('main'),
-                    db.qzoneSettings.get('main'),
-                    db.qzonePosts.toArray(),
-                    db.qzoneAlbums.toArray(),
-                    db.qzonePhotos.toArray(),
-                    db.favorites.toArray(),
-                    db.qzoneGroups.toArray(),
-                    db.memories.toArray(),
-                    db.worldBookCategories.toArray(),
-                    db.apiPresets.toArray(),
-                    db.shoppingProducts.toArray(),
-                    db.callRecords.toArray(),
-                    // 【核心修复2：在这里添加对新数据表的读取】
-                    db.renderingRules.toArray()
-                ]);
+        // 3. 【核心修改】使用 JSZip 创建压缩包
+        const zip = new JSZip();
+        const jsonFileName = `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json`;
         
-                Object.assign(backupData, {
-                    chats, worldBooks, userStickers, apiConfig, globalSettings,
-                    personaPresets, musicLibrary, qzoneSettings, qzonePosts,
-                    qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
-                    memories, worldBookCategories,
-                    apiPresets, shoppingProducts, callRecords,
-                    // 【核心修复3：将新数据添加到备份对象中】
-                    renderingRules
-                });
-                
-                const blob = new Blob(
-                    [JSON.stringify(backupData, null, 2)], 
-                    { type: 'application/json' }
-                );
-                const url = URL.createObjectURL(blob);
-                const link = Object.assign(document.createElement('a'), {
-                    href: url,
-                    download: `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json`
-                });
-                link.click();
-                URL.revokeObjectURL(url);
-                
-                await showCustomAlert('导出成功', '已成功导出所有数据！');
+        // 将所有数据转换为JSON字符串，并添加到ZIP文件中
+        zip.file(jsonFileName, JSON.stringify(backupData, null, 2));
+
+        // 异步生成ZIP文件的二进制内容 (Blob)
+        const blob = await zip.generateAsync({ type: "blob" });
+
+        // 4. 创建并触发下载链接，这部分逻辑与之前类似，但文件名后缀已改为 .zip
+        const url = URL.createObjectURL(blob);
+        const link = Object.assign(document.createElement('a'), {
+            href: url,
+            download: `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.zip`
+        });
+        link.click();
+        URL.revokeObjectURL(url);
         
-            } catch (error) {
-                console.error("导出数据时出错:", error);
-                await showCustomAlert('导出失败', `发生了一个错误: ${error.message}`);
-            }
-        }
+        // 5. 更新成功提示信息
+        await showCustomAlert('导出成功', '已成功导出所有数据为 .zip 压缩包！');
+
+    } catch (error) {
+        console.error("导出数据时出错:", error);
+        await showCustomAlert('导出失败', `发生了一个错误: ${error.message}`);
+    }
+}
+// ▲▲▲ 替换结束 ▲▲▲
         
         // ▼▼▼ 用这个【已包含 memories】的版本，完整替换旧的 importBackup 函数 ▼▼▼
         // ▼▼▼ 【这是导入函数修复版】 ▼▼▼
@@ -34730,4 +34743,3 @@ document.getElementById('regenerate-char-usage-btn').addEventListener('click', h
 <audio id="char-audio-player" preload="auto"></audio>
 </body>
 </html>
-
