@@ -13142,7 +13142,7 @@ async function cleanupRedundantData() {
     }
 }
 // ▲▲▲ 粘贴结束 ▲▲▲        
-// ▼▼▼ 【最终闪白屏修复版】 ▼▼▼
+        // ▼▼▼ 【这是导出函数修复版】 ▼▼▼
         async function exportBackup() {
             try {
                 const backupData = {
@@ -13156,9 +13156,8 @@ async function cleanupRedundantData() {
                     qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
                     memories, worldBookCategories,
                     apiPresets, shoppingProducts, callRecords,
-                    renderingRules, 
-                    appearancePresets,
-                    stickerCategories
+                    // 【核心修复1：在这里添加缺失的变量】
+                    renderingRules 
                 ] = await Promise.all([
                     db.chats.toArray(),
                     db.worldBooks.toArray(),
@@ -13178,9 +13177,8 @@ async function cleanupRedundantData() {
                     db.apiPresets.toArray(),
                     db.shoppingProducts.toArray(),
                     db.callRecords.toArray(),
-                    db.renderingRules.toArray(),
-                    db.appearancePresets.toArray(),
-                    db.stickerCategories.toArray()
+                    // 【核心修复2：在这里添加对新数据表的读取】
+                    db.renderingRules.toArray()
                 ]);
         
                 Object.assign(backupData, {
@@ -13189,9 +13187,8 @@ async function cleanupRedundantData() {
                     qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
                     memories, worldBookCategories,
                     apiPresets, shoppingProducts, callRecords,
-                    renderingRules,
-                    appearancePresets,
-                    stickerCategories
+                    // 【核心修复3：将新数据添加到备份对象中】
+                    renderingRules
                 });
                 
                 const blob = new Blob(
@@ -13203,28 +13200,8 @@ async function cleanupRedundantData() {
                     href: url,
                     download: `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json`
                 });
-
-                // ==========================================================
-                // ★★★★★ 这就是本次修复的核心！ ★★★★★
-                // ==========================================================
-                
-                // 1. 将隐藏的下载链接添加到页面上（这是更稳妥的做法）
-                document.body.appendChild(link);
-                
-                // 2. 触发点击以下载文件
                 link.click();
-
-                // 3. 使用一个短暂的延迟来确保浏览器有足够的时间开始下载
-                setTimeout(() => {
-                    // 4. 从页面上移除这个隐藏的链接
-                    document.body.removeChild(link);
-                    // 5. 销毁临时的下载URL，释放内存
-                    URL.revokeObjectURL(url);
-                }, 100); // 100毫秒的延迟通常足够了
-
-                // ==========================================================
-                // ★★★★★ 修复结束 ★★★★★
-                // ==========================================================
+                URL.revokeObjectURL(url);
                 
                 await showCustomAlert('导出成功', '已成功导出所有数据！');
         
@@ -13234,7 +13211,8 @@ async function cleanupRedundantData() {
             }
         }
         
-// ▼▼▼ 【这是导入函数修复版】 ▼▼▼
+        // ▼▼▼ 用这个【已包含 memories】的版本，完整替换旧的 importBackup 函数 ▼▼▼
+        // ▼▼▼ 【这是导入函数修复版】 ▼▼▼
         async function importBackup(file) {
             if (!file) return;
         
@@ -13256,21 +13234,28 @@ async function cleanupRedundantData() {
                     }
         
                     if (Array.isArray(data.chats)) await db.chats.bulkPut(data.chats);
-                    if (data.worldBooks && Array.isArray(data.worldBooks)) {
-                        console.log("正在检查世界书数据格式以确保兼容性...");
-                        data.worldBooks.forEach(book => {
-                            if (typeof book.content === 'string') {
-                                console.log(`检测到旧格式的世界书: "${book.name}"，正在自动迁移...`);
-                                const oldContentString = book.content;
-                                book.content = [{
-                                    keys: [],
-                                    comment: "从旧版本自动迁移的条目",
-                                    content: oldContentString,
-                                    enabled: true
-                                }];
-                            }
-                        });
-                    }
+// ▼▼▼ 【全新】世界书旧版本数据兼容代码 ▼▼▼
+if (data.worldBooks && Array.isArray(data.worldBooks)) {
+    console.log("正在检查世界书数据格式以确保兼容性...");
+    data.worldBooks.forEach(book => {
+        // 检查 content 字段是否是旧的字符串格式
+        if (typeof book.content === 'string') {
+            console.log(`检测到旧格式的世界书: "${book.name}"，正在自动迁移...`);
+            
+            // 将旧的字符串内容保存下来
+            const oldContentString = book.content;
+
+            // 【核心转换】将字符串替换为新的数组格式
+            book.content = [{
+                keys: [], // 默认为空关键词
+                comment: "从旧版本自动迁移的条目", // 添加一个备注
+                content: oldContentString, // 将旧的文本放入新结构中
+                enabled: true // 默认启用
+            }];
+        }
+    });
+}
+// ▲▲▲ 代码粘贴结束 ▲▲▲
                     if (Array.isArray(data.worldBooks)) await db.worldBooks.bulkPut(data.worldBooks);
                     if (Array.isArray(data.worldBookCategories)) await db.worldBookCategories.bulkPut(data.worldBookCategories);
                     if (Array.isArray(data.userStickers)) await db.userStickers.bulkPut(data.userStickers);
@@ -13281,15 +13266,13 @@ async function cleanupRedundantData() {
                     if (Array.isArray(data.favorites)) await db.favorites.bulkPut(data.favorites);
                     if (Array.isArray(data.qzoneGroups)) await db.qzoneGroups.bulkPut(data.qzoneGroups);
                     if (Array.isArray(data.memories)) await db.memories.bulkPut(data.memories);
+                    
                     if (Array.isArray(data.apiPresets)) await db.apiPresets.bulkPut(data.apiPresets);
                     if (Array.isArray(data.shoppingProducts)) await db.shoppingProducts.bulkPut(data.shoppingProducts);
                     if (Array.isArray(data.callRecords)) await db.callRecords.bulkPut(data.callRecords);
+                    // 【核心修复：在这里添加对渲染规则数据的写入操作】
                     if (Array.isArray(data.renderingRules)) await db.renderingRules.bulkPut(data.renderingRules);
-                    // 【核心新增】导入 appearancePresets 数据
-                    if (Array.isArray(data.appearancePresets)) await db.appearancePresets.bulkPut(data.appearancePresets);
-                    // 【核心新增】导入 stickerCategories 数据
-                    if (Array.isArray(data.stickerCategories)) await db.stickerCategories.bulkPut(data.stickerCategories);
-
+        
                     if (data.apiConfig) await db.apiConfig.put(data.apiConfig);
                     if (data.globalSettings) await db.globalSettings.put(data.globalSettings);
                     if (data.musicLibrary) await db.musicLibrary.put(data.musicLibrary);
@@ -13307,6 +13290,43 @@ async function cleanupRedundantData() {
                 await showCustomAlert('导入失败', `文件格式不正确或数据已损坏: ${error.message}`);
             }
         }
+        
+                function applyCustomFont(fontUrl, isPreviewOnly = false) {
+                    if (!fontUrl) {
+                        dynamicFontStyle.innerHTML = '';
+                        document.getElementById('font-preview').style.fontFamily = '';
+                        return;
+                    }
+                    const fontName = 'custom-user-font';
+                    const newStyle = `
+                        @font-face {
+                          font-family: '${fontName}';
+                          src: url('${fontUrl}');
+                          font-display: swap;
+                        }`;
+                    if (isPreviewOnly) {
+                        const previewStyle = document.getElementById('preview-font-style') || document.createElement('style');
+                        previewStyle.id = 'preview-font-style';
+                        previewStyle.innerHTML = newStyle;
+                        if (!document.getElementById('preview-font-style')) document.head.appendChild(previewStyle);
+                        document.getElementById('font-preview').style.fontFamily = `'${fontName}', 'bulangni', sans-serif`;
+                    } else {
+                        dynamicFontStyle.innerHTML = `
+                            ${newStyle}
+                            body {
+                              font-family: '${fontName}', 'bulangni', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                            }`;
+                    }
+                }
+        
+                async function resetToDefaultFont() {
+                    dynamicFontStyle.innerHTML = ''; 
+                    state.globalSettings.fontUrl = '';
+                    await db.globalSettings.put(state.globalSettings);
+                    document.getElementById('font-url-input').value = '';
+                    document.getElementById('font-preview').style.fontFamily = '';
+                    alert('已恢复默认字体。');
+                }
         
 // ▼▼▼ 【最终修复版】请用这个【已彻底修复数据迁移和语法错误】的版本，完整替换旧的 loadAllDataFromDB 函数 ▼▼▼
 async function loadAllDataFromDB() {
