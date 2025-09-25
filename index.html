@@ -11874,7 +11874,7 @@ commentActions.forEach(action => {
         
         // ▼▼▼ 【请用这个 V30 版本】完整替换旧的 db.version(...) 代码块 ▼▼▼
         db.version(31).stores({ 
-            chats: '&id, isGroup, groupId, isPinned',
+            chats: '&id, isGroup, groupId, isPinned, memos, diary, appUsageLog',
             apiConfig: '&id', 
             globalSettings: '&id', 
             userStickers: '&id, url, name, categoryId',
