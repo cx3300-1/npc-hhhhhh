@@ -13143,86 +13143,114 @@ async function cleanupRedundantData() {
     }
 }
 // ▲▲▲ 粘贴结束 ▲▲▲        
-// ▼▼▼ 【请用这个支持ZIP压缩的全新版本】完整替换旧的 exportBackup 函数 ▼▼▼
+/**
+ * 【V4.0 | 分块处理终极版】导出所有数据为ZIP压缩包
+ * - 专门为解决iOS设备因内存不足导致的闪退刷新问题而设计
+ * - 采用分块处理，逐个读取数据库表，显著降低峰值内存占用
+ */
 async function exportBackup() {
     try {
-        // 1. 显示“导出中”的提示，改善用户体验
-        await showCustomAlert("请稍候...", "正在准备您的数据备份...");
+        await showCustomAlert("请稍候...", "正在以安全模式准备并深度压缩您的数据备份...");
 
-        const backupData = {
-            version: 1,
+        const zip = new JSZip();
+        const imagesFolder = zip.folder("images");
+        
+        // 这个对象将用来临时存放处理后的、不含图片数据的纯JSON信息
+        let dataForJson = {
+            version: 2, // 保持与V3.0兼容的版本号
             timestamp: Date.now()
         };
 
-        // 2. 从数据库收集所有数据的逻辑保持不变
-        const [
-            chats, worldBooks, userStickers, apiConfig, globalSettings,
-            personaPresets, musicLibrary, qzoneSettings, qzonePosts,
-            qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
-            memories, worldBookCategories,
-            apiPresets, shoppingProducts, callRecords,
-            renderingRules, appearancePresets, stickerCategories
-        ] = await Promise.all([
-            db.chats.toArray(),
-            db.worldBooks.toArray(),
-            db.userStickers.toArray(),
-            db.apiConfig.get('main'),
-            db.globalSettings.get('main'),
-            db.personaPresets.toArray(),
-            db.musicLibrary.get('main'),
-            db.qzoneSettings.get('main'),
-            db.qzonePosts.toArray(),
-            db.qzoneAlbums.toArray(),
-            db.qzonePhotos.toArray(),
-            db.favorites.toArray(),
-            db.qzoneGroups.toArray(),
-            db.memories.toArray(),
-            db.worldBookCategories.toArray(),
-            db.apiPresets.toArray(),
-            db.shoppingProducts.toArray(),
-            db.callRecords.toArray(),
-            db.renderingRules.toArray(),
-            db.appearancePresets.toArray(),
-            db.stickerCategories.toArray()
-        ]);
+        // 定义需要备份的表和单例对象
+        const tablesToBackup = [
+            'chats', 'worldBooks', 'userStickers', 'personaPresets',
+            'qzonePosts', 'qzoneAlbums', 'qzonePhotos', 'favorites',
+            'qzoneGroups', 'memories', 'worldBookCategories', 'apiPresets',
+            'shoppingProducts', 'callRecords', 'renderingRules',
+            'appearancePresets', 'stickerCategories'
+        ];
+        const singletonsToBackup = [
+            'apiConfig', 'globalSettings', 'musicLibrary', 'qzoneSettings'
+        ];
 
-        Object.assign(backupData, {
-            chats, worldBooks, userStickers, apiConfig, globalSettings,
-            personaPresets, musicLibrary, qzoneSettings, qzonePosts,
-            qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
-            memories, worldBookCategories,
-            apiPresets, shoppingProducts, callRecords,
-            renderingRules, appearancePresets, stickerCategories
+        // 辅助函数：将Base64图片处理并替换为路径
+        // 这个函数现在会接收一个对象数组，处理完后返回不含图片的新数组
+        async function processImagesAndReplace(items) {
+            let processedItems = JSON.parse(JSON.stringify(items)); // 创建深拷贝以安全修改
+
+            // 将对象或数组统一包装成数组处理
+            let itemsArray = Array.isArray(processedItems) ? processedItems : [processedItems];
+
+            for (const item of itemsArray) {
+                // 使用递归函数深入查找并替换所有图片
+                await (async function replaceRecursively(obj) {
+                    for (const key in obj) {
+                        if (typeof obj[key] === 'string' && obj[key].startsWith('data:image')) {
+                            const base64Data = obj[key];
+                            const fileExtension = base64Data.substring("data:image/".length, base64Data.indexOf(";base64"));
+                            const fileName = `${key}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
+                            
+                            const imageBlob = dataURLtoBlob(base64Data);
+                            imagesFolder.file(fileName, imageBlob); // 添加到ZIP中
+                            obj[key] = `images/${fileName}`; // 替换为路径
+                        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                            await replaceRecursively(obj[key]);
+                        }
+                    }
+                })(item);
+            }
+            // 返回处理后的数据
+            return Array.isArray(processedItems) ? processedItems : processedItems[0];
+        }
+
+        // --- 【核心：分块处理流程】 ---
+        console.log("开始分块处理数据库表...");
+        for (const tableName of tablesToBackup) {
+            console.log(`正在处理表: ${tableName}...`);
+            const items = await db[tableName].toArray();
+            if (items.length > 0) {
+                // 处理完一个表的数据后，再存入最终的JSON对象
+                dataForJson[tableName] = await processImagesAndReplace(items);
+            }
+        }
+        console.log("所有表处理完毕。");
+        
+        console.log("开始处理单例对象...");
+        for (const singletonName of singletonsToBackup) {
+            const item = await db[singletonName].get('main');
+            if (item) {
+                dataForJson[singletonName] = await processImagesAndReplace(item);
+            }
+        }
+        console.log("所有单例对象处理完毕。");
+        // --- 【处理流程结束】 ---
+
+        const jsonFileName = `EPhone-Backup-${new Date().toISOString().split('T')[0]}.json`;
+        zip.file(jsonFileName, JSON.stringify(dataForJson, null, 2));
+
+        const blob = await zip.generateAsync({
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: {
+                level: 9 
+            }
         });
         
-        // 3. 【核心修改】使用 JSZip 创建压缩包
-        const zip = new JSZip();
-        const jsonFileName = `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json`;
-        
-        // 将所有数据转换为JSON字符串，并添加到ZIP文件中
-        zip.file(jsonFileName, JSON.stringify(backupData, null, 2));
-
-        // 异步生成ZIP文件的二进制内容 (Blob)
-        const blob = await zip.generateAsync({ type: "blob" });
-
-        // 4. 创建并触发下载链接，这部分逻辑与之前类似，但文件名后缀已改为 .zip
         const url = URL.createObjectURL(blob);
         const link = Object.assign(document.createElement('a'), {
             href: url,
-            download: `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.zip`
+            download: `EPhone-Backup-${new Date().toISOString().split('T')[0]}.zip`
         });
         link.click();
         URL.revokeObjectURL(url);
         
-        // 5. 更新成功提示信息
-        await showCustomAlert('导出成功', '已成功导出所有数据为 .zip 压缩包！');
+        await showCustomAlert('导出成功', '已成功导出所有数据！本次导出使用了内存优化模式，应该不会再导致闪退。');
 
     } catch (error) {
         console.error("导出数据时出错:", error);
         await showCustomAlert('导出失败', `发生了一个错误: ${error.message}`);
     }
 }
-// ▲▲▲ 替换结束 ▲▲▲
         
         // ▼▼▼ 用这个【已包含 memories】的版本，完整替换旧的 importBackup 函数 ▼▼▼
         // ▼▼▼ 【这是导入函数修复版】 ▼▼▼
@@ -30378,7 +30406,33 @@ function setupCharPlayerControls() {
     });
 }
 /* ▲▲▲ JS代码替换结束 ▲▲▲ */
+/**
+ * 【全新辅助函数】将 Base64 Data URL 转换为 Blob 对象
+ * @param {string} dataurl - Base64 格式的 Data URL
+ * @returns {Blob} - 转换后的 Blob 对象
+ */
+function dataURLtoBlob(dataurl) {
+    let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+}
 
+/**
+ * 【全新辅助函数】将 Blob 对象转换为 Base64 Data URL
+ * @param {Blob} blob - 要转换的 Blob 对象
+ * @returns {Promise<string>} - 返回一个Promise，解析为 Base64 格式的 Data URL
+ */
+function blobToDataURL(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = e => reject(e.target.error);
+        reader.readAsDataURL(blob);
+    });
+}
                // ===================================================================
                 // 4. 初始化函数 init()
                 // ===================================================================
